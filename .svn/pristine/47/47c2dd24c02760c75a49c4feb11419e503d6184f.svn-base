@@ -1,0 +1,83 @@
+package com.hrxt.mapper;
+
+import java.util.Map;
+/**
+ * 获取 心井生产运行科  信息
+ * @author ZhaoQin
+ *
+ */
+public interface CsjhMapper {
+	
+	/**
+	 *查询  
+	 */
+	String p_get_csjh(Map<String, Object> param);
+	
+	/**
+	 * 获取测试计划      舍弃 2018年11月19日18:07:58
+	 * @param param
+	 * @return
+	 */
+	String p_get_dzs_cs_report(Map<String, Object> param);
+	
+	
+	/**
+	 * 测试计划   报表        java后台遍历  拼接excel文件    
+	 * 返回javabean：ReportCSJH
+	 * 	i_site_id ：id逗号拼接
+	 * 	i_cs_id ：id逗号拼接
+	 * 	i_stime ：必传
+	 * @param param
+	 * @return
+	 */
+	String p_dzs_csjh_report(Map<String, Object> param);
+	
+	
+	/**
+	 * 新增或者更新
+	 */
+	String p_dzs_insert_up_csjh(Map<String, Object> param);
+	
+	/**
+	 * excel批量上传
+	 * @param param
+	 * @return
+	 */
+	String p_dzs_insert_up_csjh_excel(Map<String, Object> param);
+	
+	
+	/**
+	 * 删除
+	 * @param param
+	 * @return
+	 */
+	Integer p_dzs_del_csjh(Map<String, Object> param);
+	
+	
+	
+	/**
+	 * 提交记录为审核状态
+	 * @param sqp
+	 * @return
+	 */
+	int auditOneCsjh(String seq);
+	
+	int unAuditOneCsjh(String seq);
+	/**
+	 * 记录的提交
+	 * @param seq
+	 * @return
+	 */
+	int submitCsjh(String seq);
+	
+	int unSubmitCsjh(String seq);
+	
+	
+	//  csjh＿Option
+	public int p_dzs_well_cs_del(Map<String, Object> param);
+	
+	public int p_zds_well_cs_in_up(Map<String, Object> param);
+	
+	public String p_zds_well_cs_get(Map<String, Object> param);
+	
+}

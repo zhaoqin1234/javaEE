@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>文件上传</title>
+</head>
+<body>
+	xls文件格式
+	<hr>
+	<form action="/fileUploadController" method="post" enctype="multipart/form-data">
+		文件上传<input type="file" name="filename" />
+		<input type="submit"/>
+	</form>
+	xlsx文件格式
+	<hr>
+	<form action="monthPZ/excelUpdateMonthPZ" method="post" enctype="multipart/form-data">
+		UpdateMonthPZ<input type="file" name="fileMult" />
+		<input type="submit"/>
+	</form>
+</body>
+</html>

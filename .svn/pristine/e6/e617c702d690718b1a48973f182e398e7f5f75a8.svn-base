@@ -1,0 +1,29 @@
+package com.hrxt.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.hrxt.pojo.Csjh;
+import com.hrxt.pojo.Page;
+
+public interface CsjhService {
+	
+	
+	
+public Map<String,Object> getMonthPZList(Csjh csjh,Page<List<Csjh>> page);
+	
+	
+	
+	public String  insertOrUpdate(Csjh csjh);
+	
+
+	public List<String> batchInsertOrUpdate(List<Csjh> csjhlist);
+	
+	
+
+	public String delOneYPZBB(String sep);
+	
+
+	public String delListYPZBB(String sep);
+
+} 

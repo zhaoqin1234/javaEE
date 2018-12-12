@@ -1,0 +1,16 @@
+package com.hrxt.service;
+
+import java.util.List;
+
+import com.hrxt.pojo.Org;
+
+public interface OrgService {
+
+	
+	List<Org> getAllOrgMsg();
+	
+	String getALLOrgBYJSONString();
+	
+	String getOrgMsgByOrgId(String orgId);
+} 
+ 

@@ -1,0 +1,62 @@
+package com.hrxt.mapper;
+
+import java.util.Map;
+/**
+ * 获取 心井生产运行科  信息
+ * @author ZhaoQin
+ *
+ */
+public interface CsjhMapper {
+	
+	/**
+	 *查询  
+	 */
+	String p_get_csjh(Map<String, Object> param);
+	
+	
+	/**
+	 * 新增或者更新
+	 */
+	String p_dzs_insert_up_csjh(Map<String, Object> param);
+	
+	/**
+	 * excel批量上传
+	 * @param param
+	 * @return
+	 */
+	String p_dzs_insert_up_csjh_excel(Map<String, Object> param);
+	
+	
+	/**
+	 * 删除
+	 * @param param
+	 * @return
+	 */
+	Integer p_dzs_del_csjh(Map<String, Object> param);
+	
+	
+	
+	/**
+	 * 提交记录为审核状态
+	 * @param sqp
+	 * @return
+	 */
+	int auditOneCsjh(String seq);
+	
+	int unAuditOneCsjh(String seq);
+	/**
+	 * 记录的提交
+	 * @param seq
+	 * @return
+	 */
+	int submitCsjh(String seq);
+	
+	int unSubmitCsjh(String seq);
+	
+	
+	//  csjh＿Option
+	public int p_dzs_well_cs_del(Map<String, Object> param);
+	public int p_zds_well_cs_in_up(Map<String, Object> param);
+	public String p_zds_well_cs_get(Map<String, Object> param);
+	
+}

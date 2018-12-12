@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>新井生产运行科</title>
+</head>
+<body>
+	<form id="form1" method="post">
+        <fieldset style="border:solid 1px #aaa;padding:3px;">
+            <legend >新井生产运行科</legend>
+            <div style="padding:5px;">
+            	<input name="seq" id="seq" class="mini-hidden"/>
+            	<input name="yc_name" id="yc_id" class="mini-hidden">
+	           	<table style="table-layout:fixed;">
+		            <tr>
+		                <td style="width:85px;">工区：</td>
+		                <td style="width:150px;">    
+		                    <input name="site_id" id="site_id" class="mini-combobox" textField="name" valueField="id" showClose="true" value="HBn4JTnVa2"  onvaluechanged="getWellList"
+								style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick" required="true" />
+		                </td>
+		                <td style="width:85px;">井号：</td>
+		                <td style="width:150px;">    
+		                    <input name="well_id" id="well_id" class="mini-combobox" textField="wellCommonName" valueField="wellId" showClose="true" required="true" 
+								style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick" onvaluechanged="setYc"/>
+		                </td>
+		            </tr>
+	                <tr>
+	                	<td >井类型：</td>
+	                    <td > 
+	                        <input name="well_type" id="well_type" class="mini-combobox"  showClose="true"  url="<%=basePath%>xjscyxk/getXjscyxkTypeData" textField="type_name" valueField="type_code"  required="true"
+								style="width:150px;" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"  />
+	                    </td>
+	                	<td >数据日期：</td>
+	                    <td>
+	                    	<input name="stime" id="stime" class="mini-hidden">
+	                    	<input name="time" type="text" id="time" style="width:150px;" class="mini-monthpicker" 
+	                    		format="yyyy-MM" allowinput="true" required="true" onvaluechanged="setTime" />
+	                    </td>
+	                </tr> 
+	                <tr>
+	                	<td >目前工况：</td>
+	                    <td >    
+	                        <input name="condition" class="mini-textbox" vtype="required" />
+	                    </td>
+	                   	<td >预计日产油：</td>
+	                    <td >    
+	                        <input name="prod_plan_day" class="mini-textbox" vtype="float;required" floatErrorText="请输入正确的金额!"/>
+	                    </td>
+	                </tr>
+	                <tr>
+	                	<td >备注：</td>
+	                	<td colspan="3">    
+	                    	<input name="mark" class="mini-textarea" style="width:100%;"/>
+	                	</td>
+	                </tr>
+            	</table>
+        	</div>
+        </fieldset>
+    </form>
+    <div style="text-align:center;padding:10px;">               
+    	<a class="mini-button" onclick="saveData" style="width:60px;margin-right:20px;">提交</a>       
+    	<a class="mini-button" onclick="onCancel" style="width:60px;">返回</a>       
+    </div> 
+</body>
+<script type="text/javascript">
+	var site_id,action;
+	time = getTodayMonth();
+	mini.parse();
+	var siteObj = mini.get("site_id");   //工区
+	var wellObj = mini.get("well_id");   //井号
+	var form = new mini.Form("form1");
+	//初始函数
+	function SetData(obj){
+		var data = mini.clone(obj);
+		action = data.action;
+		if(action == "edit"){
+			form.setData(data.row);
+			mini.get("time").setValue(data.row.stime);
+        	form.setChanged(false);
+        	getSiteList();
+        	getWellList();
+		}else{
+			mini.get("time").setValue(time);
+			mini.get("stime").setValue(time);
+			getSiteList();
+			getWellList();
+		}
+	}
+	function getSiteList(){
+		var url = "<%=basePath%>org/getAllOrg";
+		siteObj.setUrl(url);
+	}
+	function getWellList(){
+		site_id = siteObj.getValue();
+		var url ="<%=basePath%>well/getWellMsg?orgId=" + site_id;
+		wellObj.setUrl(url);
+	}
+	//设置油藏值
+	function setYc(e){
+		mini.get("yc_id").setValue(e.selected.siteName);
+	}
+	//设置时间
+	function setTime(e){
+		mini.get("stime").setValue(mini.get("time").getFormValue());
+	}
+	//保存数据
+	function saveData(){
+		form.validate();
+		if (form.isValid() == false){
+			return;
+		}
+		var data = form.getData();
+		data.well_name = wellObj.getText();
+		data.site_name = siteObj.getText();
+		data.well_type_name = mini.get("well_type").getText();
+		data.sh_status = "0";
+		data.tj_status = "0";
+		var url="<%=basePath%>xjscyxk/insert";
+		$.ajax({
+            url: url,
+	        type: 'post',
+	        dataType:'text',
+            data: data,
+            cache: false,
+            success: function (text) {
+                CloseWindow("save");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                mini.alert("保存失败");
+            }
+        });
+	}
+	function onCancel(){
+		CloseWindow("cancel");
+	}
+	function CloseWindow(action) {            
+        if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+                return false;
+            }
+        }
+        if (window.CloseOwnerWindow){
+        	return window.CloseOwnerWindow(action);
+        }else{
+        	window.close();            
+        }
+    }
+
+	
+	
+</script>
+</html>

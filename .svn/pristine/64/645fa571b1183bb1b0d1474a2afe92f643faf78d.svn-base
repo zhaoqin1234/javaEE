@@ -1,0 +1,268 @@
+package com.hrxt.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hrxt.mapper.MonthPZMapper;
+import com.hrxt.pojo.Dzs_pz_report_summary;
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.YpzTJ;
+import com.hrxt.service.MonthPZService;
+import com.hrxt.utils.JSONutils;
+
+import oracle.jdbc.OracleTypes;
+
+
+
+@Service
+@Transactional
+public class MonthPZServiceImpl implements MonthPZService {
+
+	@Autowired
+	private MonthPZMapper monthPZMapper;
+
+	/**
+	 * 
+	 * 
+	 * 结果集
+	 * page包含了下列的
+	 * index 第几页
+	 * size 每页大小
+	 * totalRecords 总页数的大小
+	 * data<list<MonthPZ>>  返回的数据结果集
+	 * 	
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String,Object> getMonthPZList(MonthPZ monthPZ,Page<List<MonthPZ>> page) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		
+		paramMap.put("i_seq", monthPZ.getSeq());
+		paramMap.put("i_site_id", monthPZ.getSite_id());
+		paramMap.put("i_yc_id", monthPZ.getYc_id());
+		paramMap.put("i_stime", monthPZ.getStime());
+		paramMap.put("i_well_id", monthPZ.getWell_id());
+		paramMap.put("i_tj_starts", monthPZ.getTj_starts());
+		paramMap.put("i_sh_starts", monthPZ.getSh_starts());
+		paramMap.put("i_p_index", page.getPageIndex());
+		paramMap.put("i_p_size", page.getPageSize());
+		paramMap.put("v_totalrecords", null);
+		paramMap.put("o_my_cur", OracleTypes.CURSOR);
+		monthPZMapper.p_dzs_get_ypzbb(paramMap);
+		List<MonthPZ> blockList = (List<MonthPZ>)paramMap.get("o_my_cur");
+		Integer cnt = (Integer)paramMap.get("v_totalrecords");
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("data", blockList);
+		map.put("total", cnt);
+		System.out.println(JSONutils.Object2String(blockList));
+		return map;
+	}
+	
+	/**
+	 * 获取配注信息的模板
+	 * @param monthPZ
+	 * @param page
+	 * @return
+	 */
+	public List<MonthPZ> getMonthPZMB(MonthPZ monthPZ) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		
+		paramMap.put("i_site_id", monthPZ.getSite_id());
+		paramMap.put("i_yc_id", monthPZ.getYc_id());
+		paramMap.put("i_stime", monthPZ.getStime());
+		paramMap.put("i_well_id", monthPZ.getWell_id());
+		paramMap.put("o_my_cur", OracleTypes.CURSOR);
+		monthPZMapper.p_dzs_get_ypzbb_mb(paramMap);
+		
+		return (List<MonthPZ>)paramMap.get("o_my_cur");
+	}
+	
+	
+  			
+  			
+	
+	/**
+	 * 插入或者更新(一条数据)   调用后台过程   返回结果集
+	 * @param monthPZ
+	 * @return
+	 */
+	public String insertOrUpdate(MonthPZ monthPZ) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", monthPZ.getSeq());
+		paramMap.put("i_site_name", monthPZ.getSite_name());
+		paramMap.put("i_yc_name", monthPZ.getYc_name());
+		paramMap.put("i_well_name", monthPZ.getWell_name());
+		paramMap.put("i_dzpz", monthPZ.getDzpz());
+		paramMap.put("i_khpz", monthPZ.getKhpz());
+		paramMap.put("i_mark", monthPZ.getMark());
+		paramMap.put("i_sh_starts", monthPZ.getSh_starts());
+		paramMap.put("i_tj_starts", monthPZ.getTj_starts());
+		paramMap.put("I_STIME", monthPZ.getStime());
+		paramMap.put("o_mesg", "");
+		monthPZMapper.p_DZS_INSERT_UP_YPZBB(paramMap);
+		return (String)paramMap.get("o_mesg");
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @param monthPZ
+	 * @return
+	 */
+	public String insertMonthPZ(MonthPZ monthPZ) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_site_name", monthPZ.getSite_name());
+		paramMap.put("i_yc_name", monthPZ.getYc_name());
+		paramMap.put("i_well_name", monthPZ.getWell_name());
+		paramMap.put("i_dzpz", monthPZ.getDzpz());
+		paramMap.put("i_khpz", monthPZ.getKhpz());
+		paramMap.put("i_mark", monthPZ.getMark());
+		paramMap.put("i_sh_starts", monthPZ.getSh_starts());
+		paramMap.put("i_tj_starts", monthPZ.getTj_starts());
+		paramMap.put("I_STIME", monthPZ.getStime());
+		paramMap.put("o_mesg", "");
+		String ret = monthPZMapper.p_dzs_insert_ypzbb(paramMap);
+		System.out.println(">>>>>>>"+ret);
+		return (String)paramMap.get("o_mesg");
+	}
+	
+	/**
+	 * 
+	 * @param monthPZ
+	 * @return
+	 */
+	public String updateMonthPZ(MonthPZ monthPZ) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", monthPZ.getSeq());
+		paramMap.put("i_site_name", monthPZ.getSite_name());
+		paramMap.put("i_yc_name", monthPZ.getYc_name());
+		paramMap.put("i_well_name", monthPZ.getWell_name());
+		paramMap.put("i_dzpz", monthPZ.getDzpz());
+		paramMap.put("i_khpz", monthPZ.getKhpz());
+		paramMap.put("i_mark", monthPZ.getMark());
+		paramMap.put("i_sh_starts", monthPZ.getSh_starts());
+		paramMap.put("i_tj_starts", monthPZ.getTj_starts());
+		paramMap.put("I_STIME", monthPZ.getStime());
+		paramMap.put("o_mesg", "");
+		monthPZMapper.p_dzs_update_ypzbb(paramMap);
+		return (String)paramMap.get("o_mesg");
+	}
+	/**
+	 * 通过Excel  批量新增或者更新配注计划
+	 * site_id yc_id wel_id 都是空的    stime和
+	 * @param monthPZ
+	 * @return
+	 */
+	public String insertOrUpdateByExcel(MonthPZ monthPZ) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_site_name", monthPZ.getSite_name());
+		paramMap.put("i_yc_name", monthPZ.getYc_name());
+		paramMap.put("i_well_name", monthPZ.getWell_name());
+		paramMap.put("i_dzpz", monthPZ.getDzpz());
+		paramMap.put("i_khpz", monthPZ.getKhpz());
+		paramMap.put("i_mark", monthPZ.getMark());
+		paramMap.put("i_sh_starts", monthPZ.getSh_starts());
+		paramMap.put("i_tj_starts", monthPZ.getTj_starts());
+		paramMap.put("I_STIME", monthPZ.getStime());
+		paramMap.put("o_mesg", "");
+		monthPZMapper.p_DZS_INSERT_UP_YPZBB_EXCEL(paramMap);
+		return (String)paramMap.get("o_mesg");
+	}
+	
+	
+	/**
+	 * 批量导入  数据  并返回结果集
+	 */
+	public List<String> batchInsertOrUpdate(List<MonthPZ> monthPZlist){
+		List<String> list = new ArrayList<String>();
+		for (MonthPZ monthPZ : monthPZlist) {
+			String result = insertOrUpdate(monthPZ);
+			if(result != null) {
+				list.add(result);
+			}else {
+				list.add("");   //避免空值  序列不对饮问题
+			}
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * 删除配注信息  sep
+	 */
+	
+	public String delOneYPZBB(String sep) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", sep);
+		paramMap.put("o_mesg", sep);
+		monthPZMapper.p_DZS_DEL_YPZBB(paramMap);
+		String ress = (String) paramMap.get("o_mesg");
+		return ress;
+	}
+	
+	/**
+	 * 循环删除  报表数据   
+	 * @param sep
+	 */
+	public String delListYPZBB(String sep) {
+		 return delOneYPZBB(sep);
+	}
+
+	
+	@Override
+	public String auditOneYPZBB(String sep) {
+		
+		int res = monthPZMapper.auditOneYPZBB(sep);
+		return res == 1 ? "ok" :"error";
+	}
+	
+	@Override
+	public String unAuditOneYPZBB(String sep) {
+		
+		int res = monthPZMapper.unAuditOneYPZBB(sep);
+		return res == 1 ? "ok" :"error";
+	}
+
+	@Override
+	public String submitMonthPZ(String sep) {
+		int res = monthPZMapper.submitMonthPZ(sep);
+		return res == 1 ? "ok" :"error";
+	}
+	
+	@Override
+	public String unSubmitMonthPZ(String sep) {
+		int res = monthPZMapper.unSubmitMonthPZ(sep);
+		return res == 1 ? "ok" :"error";
+	}
+
+	@Override
+	public Map<String, Object> getMonthPZBySiteIdAndDate(String site_id,String date) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_site_id", site_id);
+		paramMap.put("i_stime", date);
+		monthPZMapper.P_GET_YPZBB_REPORT(paramMap);
+		List<MonthPZ> monthPzList = (List<MonthPZ>) paramMap.get("o_my_cur");
+		List<YpzTJ> ypzTjList = (List<YpzTJ>) paramMap.get("o_my_cur_count");
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.put("monthPzList", monthPzList);
+		dataMap.put("ypzTjList", ypzTjList);
+		return dataMap;
+	}
+
+	@Override
+	public List<Dzs_pz_report_summary> getAllDzspzreportsummary() {
+		
+		List<Dzs_pz_report_summary> selectAllDZS_PZ_REPORT_SUMMARY = monthPZMapper.selectAllDZS_PZ_REPORT_SUMMARY();
+		
+		
+		return selectAllDZS_PZ_REPORT_SUMMARY;
+	}
+}

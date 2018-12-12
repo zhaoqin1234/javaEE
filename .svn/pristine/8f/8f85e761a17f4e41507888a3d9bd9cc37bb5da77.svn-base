@@ -1,0 +1,203 @@
+package com.hrxt.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.hrxt.pojo.Csjh;
+import com.hrxt.pojo.OilJCJH;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.WaterJCJH;
+import com.hrxt.service.WaterJCJHService;
+import com.hrxt.utils.ExcelUtil;
+import com.hrxt.utils.JSONutils;
+/**
+ * 【水井检测】计划
+ * 	 controller
+ * @author ZhaoQin
+ *
+ */
+@Controller
+@RequestMapping("/waterjcjh")
+public class WaterJCJHController {
+
+	@Autowired
+	private WaterJCJHService waterJCJHService;
+	
+	
+	
+	
+	@RequestMapping("/insert")
+	@ResponseBody
+	public String insetOilJCJH(WaterJCJH waterJCJH){	
+		return this.waterJCJHService.insertOrUpdate(waterJCJH);
+	}
+	
+	
+	@RequestMapping("/insertList")
+	@ResponseBody
+	public String insetOilJCJHList( WaterJCJH oilJCJH){	
+		List<WaterJCJH> list11 = new ArrayList<WaterJCJH>();
+		list11.add(oilJCJH);
+		List<String> list = waterJCJHService.batchInsertOrUpdate(list11);
+		return JSONutils.Object2String(list);
+	}
+	
+	
+	@RequestMapping("/delOneWaterJCJH")
+	@ResponseBody
+	public String delOneOilJCJH(String seq){	
+		  return waterJCJHService.delOneWaterJCJH(seq);
+	}
+
+	/**
+	 * 不适用
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/delWaterJCJHList")
+	@ResponseBody
+	public String delOilJCJHList(String seqlist){	
+		return waterJCJHService.delListWaterJCJH(seqlist);
+	}
+	
+	
+	@RequestMapping("/getWaterJCJHList")
+	@ResponseBody
+	public String getOilJCJHList(WaterJCJH waterJCJH,Page<List<WaterJCJH>> page){	
+		return JSONutils.Object2String(waterJCJHService.getWaterJCJHList(waterJCJH, page));
+	}
+	
+	
+	/**
+	 * 批量上传数据
+	 * @param fileMult
+	 * @param fileName
+	 * @return
+	 */
+	@RequestMapping("/excelUpdateWaterJCJH")
+	public String updateWaterJCJHList(MultipartFile fileMult,String fileName){	
+		List<Map<String, Object>> list = null;
+		if(fileMult==null) {
+			//System.out.println("没有数据流");
+			return "没有数据流";
+		}
+		try {
+			String name =  fileMult.getOriginalFilename();
+			InputStream is = fileMult.getInputStream();
+			//System.out.println(name+is);
+			String [] fileds = {"site_name","yc_name","well_name","dzpz","khpz","stime","mark"};
+			if(is != null) {
+									//sheet0  第一行   iostream 传入文件名  读取字段名字
+				list = ExcelUtil.getDataListByexcel(0, 1, is, name, fileds);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			WaterJCJH waterJCJH = new WaterJCJH();
+			waterJCJH.setSite_name((String)map.get("site_name"));
+			waterJCJH.setYc_name((String)map.get("yc_name"));
+			//oilJCJH.setDzpz((Integer.parseInt((String) map.get("dzpz"))));
+			waterJCJH.setWell_name((String)map.get("well_name"));
+			waterJCJH.setStime((String)map.get("stime"));
+			//oilJCJH.setMark((String)map.get("mark"));
+			System.out.println(JSONutils.Object2String(map));
+			this.waterJCJHService.insertOrUpdate(waterJCJH);
+		}
+		
+		return "";
+	}
+	
+	
+	
+	/**  
+	 * 下载导入模板        措施计划, 
+	 */
+	@RequestMapping("/dwnloadWaterJCJHTmp")
+	public void dwnloadTmpMB(WaterJCJH waterJCJH,HttpServletResponse response,String fileName){
+		
+		//获取措施计划数据
+		List<WaterJCJH> datalist =  this.waterJCJHService.getOilJCJHExcelMoBan(waterJCJH);
+		
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "措施计划";//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注","时间","备注"};
+        
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        //在excel表中添加表头
+
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (WaterJCJH csjhTmp : datalist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(csjhTmp.getSite_name());
+            row1.createCell(1).setCellValue(csjhTmp.getYc_name());
+            row1.createCell(2).setCellValue(csjhTmp.getWell_name());
+        
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try { 
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	
+	
+	
+}

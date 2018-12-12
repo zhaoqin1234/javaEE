@@ -1,0 +1,50 @@
+package com.hrxt.pojo;
+
+/**
+ * 按钮entry
+ * @author ZhaoQin
+ *
+ */
+public class Button {
+	
+	private String id;		//主键id
+	private String key;		//按钮id
+	private String name;	//按钮名称
+	private String suatus;	//按钮是否启用
+	private String mark;	//备注信息
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSuatus() {
+		return suatus;
+	}
+	public void setSuatus(String suatus) {
+		this.suatus = suatus;
+	}
+	public String getMark() {
+		return mark;
+	}
+	public void setMark(String mark) {
+		this.mark = mark;
+	}
+	
+	
+	
+	
+}

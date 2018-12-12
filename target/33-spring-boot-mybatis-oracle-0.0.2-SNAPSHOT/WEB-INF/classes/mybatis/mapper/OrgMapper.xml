@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.OrgMapper">
+
+	<!-- 断块entry 字段映射  -->
+	<resultMap id="org_Mp" type="com.hrxt.pojo.Org">
+		<result property="id" 		jdbcType="VARCHAR" column="ORG_ID"/>
+		<result property="name" 	jdbcType="VARCHAR" column="ORG_NAME"/>
+	</resultMap>
+	
+	<!-- 获得某个工区下面的 工区信息   —-->
+	<select id="getAllOrgMsg" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_ZDWH.P_DZS_GET_ALL_ORG(
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=org_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	<!-- 获得某个工区下面的 工区信息   —-->
+	<select id="getOrgMsgByOrgId" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_ZDWH.P_DZS_GET_SUB_ORG(
+		  			#{i_org_id, mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=org_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	<resultMap id="p_Site_gongqu_Mp" type="com.hrxt.pojo.Site">
+		<result property="site_id" 		jdbcType="VARCHAR" column="org_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="org_name"/>
+	</resultMap>
+	
+	<!-- java == site    database == org    -->
+	<select id="p_get_public_Site" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_DZSBB.p_get_public_org(
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=p_Site_gongqu_Mp}
+		          )
+	    ]]>
+	</select>
+	
+</mapper>

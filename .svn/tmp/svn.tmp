@@ -1,0 +1,87 @@
+package com.hrxt.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.hrxt.pojo.JCJHOptionOil;
+import com.hrxt.pojo.JCJHOptionWater;
+import com.hrxt.service.JCJHOptionService;
+/**
+ * 措施计划 controller
+ * @author ZhaoQin
+ *
+ */
+@Controller
+@RequestMapping("/jcjhOption")
+public class JCJHOptionController {
+
+	@Autowired
+	private JCJHOptionService jCJHOptionService;
+	
+	
+	/**  /jcjhOption/insertOrUpdateJCJHOptionWater
+	 */
+	@RequestMapping("/insertOrUpdateJCJHOptionWater")
+	@ResponseBody
+	public String insertOrUpdateJCJHOptionWater(JCJHOptionWater jCJHOption){	
+		return this.jCJHOptionService.insertOrUpdateJCJHOptionWater(jCJHOption);
+	}
+	
+	
+	/**  /jcjhOption/insertOrUpdateJCJHOptionOil
+	 */
+	@RequestMapping("/insertOrUpdateJCJHOptionOil")
+	@ResponseBody
+	public String insertOrUpdateJCJHOptionOil(JCJHOptionOil jCJHOption){	
+		return this.jCJHOptionService.insertOrUpdateJCJHOptionOil(jCJHOption);
+	}
+	
+	
+	/**  /jcjhOption/deleteJCJHOptionWater
+	 * 	删除传递jcjh——id
+	 */
+	@RequestMapping("/deleteJCJHOptionWater")
+	@ResponseBody
+	public String deleteJCJHOptionWater(JCJHOptionWater jCJHOption){	
+		return this.jCJHOptionService.deleteJCJHOptionWAter(jCJHOption.getJcjh_id());
+	}
+	
+	
+	/**  /jcjhOption/deleteJCJHOptionOil
+	 * 	删除传递jcjh——id
+	 */
+	@RequestMapping("/deleteJCJHOptionOil")
+	@ResponseBody
+	public String deleteJCJHOptionOil(JCJHOptionOil jCJHOption){	
+		return this.jCJHOptionService.deleteJCJHOptionOil(jCJHOption.getJcjh_id());
+	}
+	
+	
+	/**   
+	 * 	不需要传递参数
+	 */
+	@RequestMapping("/getJCJHOptionWater")
+	@ResponseBody
+	public String getJCJHOptionWater(JCJHOptionWater jCJHOption){	
+		List<JCJHOptionWater> list =this.jCJHOptionService.getJCJHOptionWater(null);
+		return JSON.toJSONString(list);
+	}
+	
+	
+	/**  /jcjhOption/getJCJHOptionOil
+	 * 	不需要传递参数
+	 */
+	@RequestMapping("/getJCJHOptionOil")
+	@ResponseBody
+	public String getJCJHOptionOil(JCJHOptionOil jCJHOption){	
+		List<JCJHOptionOil> list =this.jCJHOptionService.getJCJHOptionOil(null);
+		return JSON.toJSONString(list);
+	}
+	
+	
+}

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>月配注数据</title>
+</head>
+<body>
+	<form id="form1" method="post">
+        <fieldset style="border:solid 1px #aaa;padding:3px;">
+            <legend >月配注数据</legend>
+            <div style="padding:5px;">
+            	<input id="seq" name="seq" class="mini-hidden"/>
+            		<input id="yc_id"   name="yc_id" class="mini-hidden"/>
+	           	<table style="table-layout:fixed;">
+		            <tr>
+		                <td style="width:85px;">工区：</td>
+		                <td style="width:150px;">    
+		                    <input name="site_id" id="site_id" class="mini-combobox" textField="name" valueField="id"  
+								style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." onvaluechanged="getWellListBySiteAndGetYcBySite"  
+								required="true" />
+		                </td>
+		               <td style="width:200px;" align="right">油藏：</td>
+		                <td style="width:150px;">    
+		                    <input name="yc_name" id="yc_name" class="mini-combobox" textField="name" valueField="name"  
+								style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." onvaluechanged="getWellListByYc()"
+								required="true" />
+		                </td>
+		            </tr>
+	                <tr>
+	                
+	                  <td style="width:85px;">井号：</td>
+		                <td >    
+<!-- 		                	<input name="yc_name" id="yc_id" class="mini-hidden"> -->
+		                    <input name="well_id" id="well_id" class="mini-combobox" textField="wellCommonName" valueField="wellId" 
+								style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..."
+								required="true" requiredErrorText="井号不能为空" onvaluechanged="setYc"/> 
+		                </td>
+	                	<td style="width:200px;" align="right">地质配注：</td>
+	                    <td > 
+	                        <input name="dzpz" class="mini-textbox" vtype="float" required="true" floatErrorText="请输入数字" />
+	                    </td>
+	                  
+	                </tr> 
+	                <tr>
+	                	<td >考核配注：</td>
+	                    <td >    
+	                        <input name="khpz" class="mini-textbox" vtype="float" floatErrorText="请输入数字"/>
+	                    </td>
+	                    <td style="width:200px;" align="right">日期：</td>
+	                    <td >
+	                    	<input name="stime" id="stime" class="mini-hidden">
+							<input name="time" vtype="date:yyyy-MM" id="time" class="mini-monthpicker" format="yyyy-MM" allowinput="true" onvaluechanged="setTime" required="true"/>
+						</td>
+	                </tr>
+	                <tr>
+	                	<td >备注：</td>
+	                	<td colspan="3">    
+	                    	<input name="mark" class="mini-textarea" style="width:100%"/>
+	                	</td>
+	                </tr>
+            	</table>
+        	</div>
+        </fieldset>
+    </form>
+    <div style="text-align:center;padding:10px;">               
+    	<a class="mini-button" onclick="saveData()" style="width:60px;margin-right:20px;">提交</a>       
+    	<a class="mini-button" onclick="onCancel" style="width:60px;">返回</a>       
+    </div> 
+</body>
+<script type="text/javascript">
+	var site_id,action;
+	time = getTodayMonth();
+	mini.parse();
+	var siteObj = mini.get("site_id"); //工区
+	var wellObj = mini.get("well_id"); //井号
+	var ycObj = mini.get("yc_name"); //油藏
+	var form = new mini.Form("form1");
+	//初始函数
+	function SetData(obj){
+		var data = mini.clone(obj);
+		action = data.action;
+		if(action == "edit"){
+			form.setData(data.row);
+			mini.get("time").setValue(data.row.stime);
+        	form.setChanged(false);
+        	getOrgList();
+        	getWellList();
+		}else{
+			mini.get("time").setValue(time);
+			mini.get("stime").setValue(time);
+			getOrgList();
+			getSiteList();
+			//getWellList();
+		}
+	}
+	//油藏下拉框
+	 function getSiteList(){
+			site_id = siteObj.getValue();
+		var url = "<%=basePath%>block/getBlock?orgId=" + site_id;
+		ycObj.setUrl(url);
+	} 
+	//工区下拉框
+	function getOrgList(){
+		var url = "<%=basePath%>org/getAllOrg";
+		siteObj.setUrl(url);
+	}
+	//井号下拉框
+	function getWellList(){
+		site_id = siteObj.getValue();
+		var url ="<%=basePath%>well/getWellMsg?orgId=" + site_id;
+		wellObj.setUrl(url);
+	}
+	
+	//根据工区查询井，根据工区查询油藏
+	function getWellListBySiteAndGetYcBySite(){
+		getSiteList();
+		getWellList();
+	}
+	
+	
+	//设置油藏值
+	function setYc(e){
+		mini.get("yc_id").setValue(e.selected.siteName);
+		mini.get("yc_name").setText(e.selected.siteName);
+		mini.get("yc_name").setValue(e.selected.siteName);
+	}
+	
+	//根据油藏查询井号下拉框
+	function getWellListByYc(){
+		yc_id = ycObj.getValue();
+		var url ="<%=basePath%>well/getWellMsg?siteId=" + yc_id;
+		wellObj.setUrl(url);
+	}
+	
+	
+	//设置时间
+	function setTime(){
+		mini.get("stime").setValue(mini.get("time").getFormValue());
+	}
+	//保存数据
+	function saveData(){
+		form.validate();
+		if (form.isValid() == false){
+			return;
+		}
+		var data = form.getData();
+	/* 	if(data.stime==""){
+			mini.alert("请选择时间");
+			return;
+		} */
+		data.well_name = wellObj.getText();
+		data.site_name = siteObj.getText();
+		data.sh_starts = "0";
+		data.tj_starts = "0";
+		var url="<%=basePath%>monthPZ/insert";
+		$.ajax({
+            url: url,
+	        type: 'post',
+	        dataType:'text',
+            data: data,
+            cache: false,
+            success: function (text) {
+                CloseWindow("save");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                mini.alert("保存失败");
+            }
+        });
+	}
+	//取消
+	function onCancel(){
+		CloseWindow("cancel");
+	}
+	function CloseWindow(action) {            
+        if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+                return false;
+            }
+        }
+        if (window.CloseOwnerWindow){
+        	return window.CloseOwnerWindow(action);
+        }else{
+        	window.close();            
+        }
+    }
+</script>
+</html>

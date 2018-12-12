@@ -1,0 +1,33 @@
+﻿[
+	{ "id": "1", iconCls: "fa fa-send-o", text: "配注",children: [
+	        { "id": "1_1", iconCls: "fa fa-desktop", text: "月配注数据管理", url: "waterInjection/monthlyDataManagement" },
+	        { "id": "1_2", iconCls: "fa fa-send-o", text: "月配注数据审核", url: "waterInjection/monthleDataAudit"},
+	        { "id": "1_3", iconCls: "fa fa-search", text: "月配注综合查询", url: "waterInjection/monthlyConsolidatedQuery" }
+        ]
+	},
+    { "id": "xtgl", iconCls: "fa fa-desktop", text: "监测", children: [
+		    { "id": "21", iconCls: "fa fa-leaf", text: "测试计划", url: "monitor/monitorRaoYang" },
+		    { "id": "22", iconCls: "fa fa-book", text: "监测ss", url: "pages/1.html" },
+		    { "id": "23", iconCls: "fa fa-barcode", text: "监测dd", url: "pages/1.html" },
+		    { "id": "24", iconCls: "fa fa-navicon", text: "监测yy", url: "pages/1.html" },
+    	]
+    },
+	{ "id": "dwzz", iconCls: "fa fa-coffee",  text: "措施", children: [
+	         { "id": "31", iconCls: "fa fa-desktop", text: "新井生产运行科数据管理", url: "measure/newWellProduction" },
+	         { "id": "32", iconCls: "fa fa-send-o", text: "新井生产运行科数据审核", url: "measure/newWellProductionAudit" },
+	         { "id": "33", iconCls: "fa fa-search", text: "新井生产运行科综合查询", url: "measure/newWellProductionQuery" },
+	         { "id": "34", iconCls: "fa fa-desktop", text: "重点措施计划数据管理", url: "measure/keyMeasuresPlan" },
+	         { "id": "35", iconCls: "fa fa-send-o", text: "重点措施计划数据审核", url: "measure/keyMeasuresPlanAudit" },
+	         { "id": "36", iconCls: "fa fa-search", text: "重点措施计划综合查询", url: "measure/keyMeasuresPlanQuery" }
+	    ]
+	},
+	{ "id": "dwzz", iconCls: "fa fa-coffee",  text: "系统管理", children: [
+	         { "id": "41", iconCls: "fa fa-sitemap", text: "用户管理", url: "user/user" },
+	         { "id": "46", iconCls: "fa fa-th-list", text: "部门管理", url: "deptment/opendept" },
+	         { "id": "42", iconCls: "fa fa-th-list", text: "角色管理", url: "/role/openRole" },
+	         { "id": "43", iconCls: "fa fa-graduation-cap", text: "菜单管理", url: "authority/menu" },
+	         { "id": "44", iconCls: "fa fa-paw", text: "组织结构", url: "pages/1.html" },
+	         { "id": "45", iconCls: "fa fa-user", text: "措施ee", url: "pages/1.html" }
+	    ]
+	}
+]

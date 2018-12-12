@@ -1,0 +1,33 @@
+package com.hrxt.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.Xjscyxk;
+import com.hrxt.pojo.XjscyxkReport;
+
+public interface XjscyxkService {
+	
+	
+	// 获取数据
+	public Map<String,Object> getXjscyxkList(Xjscyxk monthPZ,Page<List<Xjscyxk>> page);
+	
+	//新井生产运行科 报表数据
+	public List<XjscyxkReport> getXjscyxkReport(String stime,String site_id);
+	
+	public Map<String,Object>  insertOrUpdate(Xjscyxk monthPZ);
+	
+	public Map<String,Object> insertOrUpdateByExcel(Xjscyxk xjscyxk);
+	
+	public List<String> batchInsertOrUpdate(List<Xjscyxk> monthPZlist);
+	
+	
+
+	public Map<String,Object> delOneYPZBB(String sep);
+	
+
+	public Map<String,Object> delListYPZBB(String sep);
+
+} 

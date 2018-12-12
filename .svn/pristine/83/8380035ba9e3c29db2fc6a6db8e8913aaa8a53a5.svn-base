@@ -1,0 +1,158 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+  <jsp:include page="../../../Inc.jsp"></jsp:include>
+  <%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+	$(function(){
+		mini.parse();
+	var grid = mini.get("datagrid");
+	var date = mini.get("startDate");
+	time = getTodayByUpMonth(); //获取上月日期
+	date.setValue(time);
+		grid.load();
+		
+	 	grid.on("load", function () {
+			grid.mergeColumns(["xm","cs_type_name"]);//合并行
+		} ) 
+			})
+	//查询
+	function search(){
+		date = mini.get("startDate").getFormValue();
+	 	if(date == ""){
+			mini.alert("开始日期不能为空");
+			return;
+		} 
+	
+		var siteIds = mini.get("site_id").getValue(); //工区Id
+		var grid = mini.get("datagrid");
+		grid.load({site_id:siteIds,date:date});
+	}
+	
+	
+	
+	function exportData(){
+		date = mini.get("startDate").getFormValue();
+	 	/* if(date == ""){
+			mini.alert("开始日期不能为空");
+			return;
+		}  */
+	
+		var siteIds = mini.get("site_id").getValue(); //工区Id
+		var siteNames = mini.get("site_id").getText(); //工区名称
+		var grid = mini.get("datagrid");
+		
+		window.location.href="<%=basePath%>oiljcjh/dwnloadOilJCJHReport?site_id="+siteIds+"&date="+date+"&siteNames="+siteNames;
+	}
+	
+	
+	
+	/**
+	 * post 将数据提交到服务器 调用poi生成excel
+	 */
+	function DownLoadExcel(url, data, callback) {
+	    //创建Form
+	    var submitfrm = document.createElement("form");
+	    submitfrm.action = url;
+	    submitfrm.method = "post";
+	    submitfrm.target = "_blank";
+	    document.body.appendChild(submitfrm);
+	    if (data) {
+	        //创建隐藏域用来保存要上传的数据。
+	        var input = mini.append(submitfrm, "<input type='hidden' name='data'>");
+	        input.value = data;
+	    }
+	    //提交
+	    submitfrm.submit();
+	    //
+	    setTimeout(function () {
+	        submitfrm.parentNode.removeChild(submitfrm);
+	        if (callback) callback();
+	    }, 1000);
+	}
+
+	function ondrawcell(e){
+		field=e.field;
+		value=e.value;
+		if(field=="cs_type_name"){
+			if(value=="小计"||value=="总计"){
+				e.rowStyle="font-weight: bold";
+			}
+		}
+
+	}
+	
+	   function onCloseClick(e) {
+           var obj = e.sender;
+           obj.setText("");
+           obj.setValue("");
+       }
+</script>
+</head>
+<body>
+	<div id="div1">
+		<div class="mini-toolbar" id="toolbar1">
+			<span>工区:</span>
+			<div id="site_id" class="mini-combobox" style="width:130px;"  textField="site_name" valueField="site_id"  emptyText="请选择..."
+			    url="<%=basePath%>org/getPublicSite" multiSelect="true"  showClose="true" oncloseclick="onCloseClick" >     
+			    <div property="columns">
+			        <div header="全选" field="site_name"></div>
+			    </div>
+			</div>
+				
+				<span class="separator"></span> 
+			<span>日期:</span>
+			<input name="startDate" type="text" id="startDate" style="width:120px;" class="mini-monthpicker" format="yyyy-MM" allowinput="false" emptyText="请选择..." showClose="true" oncloseclick="onCloseClick" />
+			<span class="separator"></span> 
+			<a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+			<span class="separator"></span> 
+			<a class="mini-button" iconCls="icon-download" onclick="exportData()">导出报表</a>
+		</div>
+		<div id="datagrid" class="mini-datagrid" style="width:100%;height:100%;" url="<%=basePath%>oiljcjh/getOilJCJHBBByType"  allowCellWrap="true" ondrawcell="ondrawcell"   enableHotTrack="true"
+			idField="id" allowResize="true" sortMode="client" multiSelect="true" showReloadButton="false" pageSize="20" allowHeaderWrap="true" showPager="false" allowUnselect="true" frozenStartColumn="0" frozenEndColumn="4">
+			<div property="columns">
+			 <div header="测试计划井号" name="gridTitle" headerAlign="center" headerStyle="font-weight: 900;"><!-- <font size="5">测试计划井号</font> -->
+			<div property="columns" >
+          		<div field="xm" name="xm" headerAlign="center" align="center" cellStyle="font-weight: bold;" headerStyle="font-weight: bold;">项目</div>
+          		<div field="cs_type_name"  name="cs_type_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">测试内容</div>
+          		<div field="well_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">井号</div>
+          		<div field="site_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">工区</div>
+          		<div field="well_section" headerAlign="center" align="center" headerStyle="font-weight: bold;">生产井段（m）</div>
+          		<div field="thickness" headerAlign="center" align="center" headerStyle="font-weight: bold;">厚度（m）</div>
+          		<div field="plies_num" headerAlign="center" align="center" headerStyle="font-weight: bold;">层数</div>
+          		  <div header="测试"  headerAlign="center"  headerStyle="font-weight: bold;align:center">
+          		    <div property="columns">
+          		<div field="cs_purpose" headerAlign="center" align="center" headerStyle="font-weight: bold;">目的</div>
+          		<div field="cs_claim" headerAlign="center" align="center"  headerStyle="font-weight: bold;">要求（层内打点位置等）</div>
+          		    </div>
+          		  </div>
+          		<div field="last_success_date" headerAlign="center" align="center" headerStyle="font-weight: bold;">上次测成时间（t）</div>
+          		<div header="最近一次" headerAlign="center"headerStyle="font-weight: bold;">
+          		  <div property="columns">
+          		<div field="recently_fail_date" headerAlign="center" align="center" headerStyle="font-weight: bold;">未测成时间</div>
+          		<div field="recently_revise_mesg" headerAlign="center" align="center" headerStyle="font-weight: bold;">整改情况</div>
+          		  </div>
+          		</div>
+          		<div field="level_demand" headerAlign="center" align="center" headerStyle="font-weight: bold;">需求程度</div>
+          		<div field="tc_date" headerAlign="center" align="center" headerStyle="font-weight: bold;">提出日期</div>
+          			<div header="生产反馈意见" headerAlign="center" headerStyle="font-weight: bold;">
+          			  <div property="columns">
+          		<div field="fk_cd_date" headerAlign="center" align="center" headerStyle="font-weight: bold;">出单日期</div>
+          		<div field="wcd_mesg" headerAlign="center" align="center" headerStyle="font-weight: bold;">未出单原因</div>
+          		<div field="sjyy" headerAlign="center" align="center" headerStyle="font-weight: bold;">测成日期及未测成原因</div>
+          			  </div>
+          			</div>
+            </div>
+            </div>
+            </div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+package com.hrxt.pojo;
+
+/**
+ * 月配置
+ * @author ZhaoQin
+ *
+ */
+public class MonthPZ {
+	
+	private  String site_id = ""; 		//工区ID
+    private  String site_name = "";      //工区名称
+    private  String yc_id = "";          //断块ID
+    private  String yc_name = "";        //断块名称
+    private  String well_id = "";        //井ID
+    private  String well_name = "";      //井名称
+    private  Integer dzpz;           //地质配注（本月实际）
+    private  Integer khpz;           //考核配注（本月计划）
+    private  Integer cz_sj_jh;       //差值（本月实际与本月计划的差值）
+    private  Integer cz_sj_sj;       //差值（本月实际与上月实际的差值）
+    private  Integer cz_jh_jh;       //差值（本月计划与上月计划的差值）
+    private  String mark = "";           //备注
+    private  String tj_starts = "";      //提交状态（0：未提交；1：已提交）
+    private  String sh_starts = "";      //审核状态（0：已审核；1：未审核）
+    private  String create_time = "";    //创建时间
+    private  String stime = "";          //数据时间
+    private  String update_time = "";    //更新时间
+    private  Integer sum_dzpz;		//断块地质配注和
+    private  Integer sum_khpz;		//断块考核配注和
+    private  Integer sum_well_cnt;	//断块井数和
+    private  String seq;			//序列
+    private  String last_kh;
+    private String upMonthPZ;  //上月考核配注
+    private String orderSort;  //排序且类别
+    
+    
+	
+	public String getOrderSort() {
+		return orderSort;
+	}
+	public void setOrderSort(String orderSort) {
+		this.orderSort = orderSort;
+	}
+	public String getUpMonthPZ() {
+		return upMonthPZ;
+	}
+	public void setUpMonthPZ(String upMonthPZ) {
+		this.upMonthPZ = upMonthPZ;
+	}
+	public String getLast_kh() {
+		return last_kh;
+	}
+	public void setLast_kh(String last_kh) {
+		this.last_kh = last_kh;
+	}
+	public String getSite_id() {
+		return site_id;
+	}
+	public void setSite_id(String site_id) {
+		this.site_id = site_id;
+	}
+	public String getSite_name() {
+		return site_name;
+	}
+	public void setSite_name(String site_name) {
+		this.site_name = site_name;
+	}
+	public String getYc_id() {
+		return yc_id;
+	}
+	public void setYc_id(String yc_id) {
+		this.yc_id = yc_id;
+	}
+	public String getYc_name() {
+		return yc_name;
+	}
+	public void setYc_name(String yc_name) {
+		this.yc_name = yc_name;
+	}
+	public String getWell_id() {
+		return well_id;
+	}
+	public void setWell_id(String well_id) {
+		this.well_id = well_id;
+	}
+	public String getWell_name() {
+		return well_name;
+	}
+	public void setWell_name(String well_name) {
+		this.well_name = well_name;
+	}
+	public Integer getDzpz() {
+		return dzpz;
+	}
+	public void setDzpz(Integer dzpz) {
+		this.dzpz = dzpz;
+	}
+	public Integer getKhpz() {
+		return khpz;
+	}
+	public void setKhpz(Integer khpz) {
+		this.khpz = khpz;
+	}
+	public Integer getCz_sj_jh() {
+		return cz_sj_jh;
+	}
+	public void setCz_sj_jh(Integer cz_sj_jh) {
+		this.cz_sj_jh = cz_sj_jh;
+	}
+	public Integer getCz_sj_sj() {
+		return cz_sj_sj;
+	}
+	public void setCz_sj_sj(Integer cz_sj_sj) {
+		this.cz_sj_sj = cz_sj_sj;
+	}
+	public Integer getCz_jh_jh() {
+		return cz_jh_jh;
+	}
+	public void setCz_jh_jh(Integer cz_jh_jh) {
+		this.cz_jh_jh = cz_jh_jh;
+	}
+	public String getMark() {
+		return mark;
+	}
+	public void setMark(String mark) {
+		this.mark = mark;
+	}
+	public String getTj_starts() {
+		return tj_starts;
+	}
+	public void setTj_starts(String tj_starts) {
+		this.tj_starts = tj_starts;
+	}
+	public String getSh_starts() {
+		return sh_starts;
+	}
+	public void setSh_starts(String sh_starts) {
+		this.sh_starts = sh_starts;
+	}
+	public String getCreate_time() {
+		return create_time;
+	}
+	public void setCreate_time(String create_time) {
+		this.create_time = create_time;
+	}
+	public String getStime() {
+		return stime;
+	}
+	public void setStime(String stime) {
+		this.stime = stime;
+	}
+	public String getUpdate_time() {
+		return update_time;
+	}
+	public void setUpdate_time(String update_time) {
+		this.update_time = update_time;
+	}
+	public Integer getSum_dzpz() {
+		return sum_dzpz;
+	}
+	public void setSum_dzpz(Integer sum_dzpz) {
+		this.sum_dzpz = sum_dzpz;
+	}
+	public Integer getSum_khpz() {
+		return sum_khpz;
+	}
+	public void setSum_khpz(Integer sum_khpz) {
+		this.sum_khpz = sum_khpz;
+	}
+	public Integer getSum_well_cnt() {
+		return sum_well_cnt;
+	}
+	public void setSum_well_cnt(Integer sum_well_cnt) {
+		this.sum_well_cnt = sum_well_cnt;
+	}
+	public String getSeq() {
+		return seq;
+	}
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
+	public MonthPZ() {
+	}
+	
+	
+    
+}

@@ -1,0 +1,629 @@
+package com.hrxt.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import com.hrxt.pojo.Csjh;
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.OilJCJH;
+import com.hrxt.pojo.Page;
+import com.hrxt.service.OilJCJHService;
+import com.hrxt.utils.ExcelUtil;
+import com.hrxt.utils.JSONutils;
+/**
+ * 油井检测计划 controller
+ * @author ZhaoQin
+ *
+ */
+@Controller
+@RequestMapping("/oiljcjh")
+public class OilJCJHController {
+
+	@Autowired
+	private OilJCJHService oilJCJHService;
+	
+	
+	@RequestMapping("/insert")
+	@ResponseBody
+	public String insetOilJCJH(OilJCJH oilJCJH){	
+		return this.oilJCJHService.insertOrUpdate(oilJCJH);
+	}
+	
+	
+	@RequestMapping("/insertList")
+	@ResponseBody
+	public String insetOilJCJHList( OilJCJH oilJCJH){	
+		List<OilJCJH> list11 = new ArrayList<OilJCJH>();
+		list11.add(oilJCJH);
+		List<String> list = oilJCJHService.batchInsertOrUpdate(list11);
+		return JSONutils.Object2String(list);
+	}
+	
+	
+	@RequestMapping("/delOneOilJCJH")
+	@ResponseBody
+	public String delOneOilJCJH(String seq){	
+		  return oilJCJHService.delOneOilJCJH(seq);
+	}
+
+	
+	@RequestMapping("/delOilJCJHList")
+	@ResponseBody
+	public String delOilJCJHList(String seqlist){	
+		return oilJCJHService.delListOilJCJH(seqlist);
+	}
+	
+	
+	@RequestMapping("/getOilJCJHList")
+	@ResponseBody
+	public String getOilJCJHList(OilJCJH oilJCJH,Page<List<OilJCJH>> page){	
+		return JSONutils.Object2String(oilJCJHService.getOilJCJHList(oilJCJH, page));
+	}
+	
+	
+	
+	
+	/**
+	 * 记录审核  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/auditOilJCJH")
+	@ResponseBody
+	public String auditOilJCJH(String seqlist){	
+		return oilJCJHService.auditOneOilJCJH(seqlist);
+	}
+	
+	@RequestMapping("/unAuditOilJCJH")
+	@ResponseBody
+	public String unAuditOilJCJH(String seqlist){	
+		return oilJCJHService.unAuditOneOilJCJH(seqlist);
+	}
+	/**
+	 * 【提交】  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/submitOilJCJH")
+	@ResponseBody
+	public String submitMonthPZ(String seqlist){	
+		return oilJCJHService.submitOilJCJH(seqlist);
+	}
+	@RequestMapping("/unSubmitOilJCJH")
+	@ResponseBody
+	public String unSubmitOilJCJH(String seqlist){	
+		return oilJCJHService.unSubmitOilJCJH(seqlist);
+	}
+	
+
+	
+	
+	/**
+	 * 批量上传数据
+	 * @param fileMult
+	 * @param fileName
+	 * @return
+	 */
+	@RequestMapping("/excelUpdateOilJCJH")
+	public String updateOilJCJHList(MultipartFile fileMult,String fileName){	
+		List<Map<String, Object>> list = null;
+		if(fileMult==null) {
+			//System.out.println("没有数据流");
+			return "没有数据流";
+		}
+		try {
+			String name =  fileMult.getOriginalFilename();
+			InputStream is = fileMult.getInputStream();
+			//System.out.println(name+is);
+			String [] fileds = {"site_name","yc_name","well_name","dzpz","khpz","stime","mark"};
+			if(is != null) {
+									//sheet0  第一行   iostream 传入文件名  读取字段名字
+				list = ExcelUtil.getDataListByexcel(0, 1, is, name, fileds);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			OilJCJH oilJCJH = new OilJCJH();
+			oilJCJH.setSite_name((String)map.get("site_name"));
+			oilJCJH.setYc_name((String)map.get("yc_name"));
+			//oilJCJH.setDzpz((Integer.parseInt((String) map.get("dzpz"))));
+			oilJCJH.setWell_name((String)map.get("well_name"));
+			oilJCJH.setStime((String)map.get("stime"));
+			//oilJCJH.setMark((String)map.get("mark"));
+			System.out.println(JSONutils.Object2String(map));
+			this.oilJCJHService.insertOrUpdate(oilJCJH);
+		}
+		
+		return "";
+	}
+	
+	
+	
+	
+	
+	
+	/**  
+	 * 下载导入模板        措施计划, 
+	 */
+	@RequestMapping("/dwnloadOilJCJHTmp")
+	public void dwnloadTmpMB(OilJCJH oilJCJH,HttpServletResponse response,String fileName){
+		//获取措施计划数据
+		List<OilJCJH> datalist = this.oilJCJHService.getOilJCJHExcelMoBan(oilJCJH);
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "措施计划";//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注","时间","备注"};
+        
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        //在excel表中添加表头
+
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (OilJCJH csjhTmp : datalist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(csjhTmp.getSite_name());
+            row1.createCell(1).setCellValue(csjhTmp.getYc_name());
+            row1.createCell(2).setCellValue(csjhTmp.getWell_name());
+         
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try { 
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	/**
+	 * 监测计划报表查询  油水井都包含了
+	 * 根据类型查询
+	 */
+	@RequestMapping("getOilJCJHBBByType")
+	@ResponseBody
+	public List<OilJCJH> getOilJCJHBBByType(String site_id ,String date){
+			List<OilJCJH> datalist = this.oilJCJHService.getOilJCJHReport(site_id, date);
+			int sumWell=0;
+			for (OilJCJH oilJCJH : datalist) {
+				if(oilJCJH.getCs_type_name().equals("小计")){
+					String wellNum = oilJCJH.getWell_name();
+					if(wellNum!=null&&!"".equals(wellNum)){
+						sumWell +=Integer.parseInt(wellNum);
+						oilJCJH.setWell_name(wellNum+"口");
+					}
+				}
+			}
+			OilJCJH oilJCJH2=new OilJCJH();
+			oilJCJH2.setCs_type_name("总计");
+			oilJCJH2.setWell_name(sumWell+"口");
+			datalist.add(oilJCJH2);
+			
+		return datalist;
+	}
+	
+	
+	/**  
+	 * 检测计划  报表下载
+	 * site_id:  工区id，逗号分隔
+	 * date：时间  yyyy-mm
+	 * @throws IOException 
+	 */
+	@RequestMapping("/dwnloadOilJCJHReport")
+	public void dwnloadOilJcjhReport(String site_id,String date ,HttpServletResponse response,String fileName) throws IOException{
+		
+	
+		String sheetName = "测试计划井号";
+		
+		String[] title1 = { "项目", "测试内容", "井号", "生产井段（m）", "厚度（m）",
+				"层数","测试","","上次测成时间","最近一次","","需求程度","提出日期","生产反馈意见","",""};
+		
+		String[] title2 = { "","","","","","","目的", "要求（层内打点位置等）","", "未测成时间", "整改情况", "","","出单日期",
+				"未出单原因","测成日期及未测成原因"};
+		
+		
+		
+		HSSFWorkbook wb = null;
+		// 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+		if (wb == null) {
+			wb = new HSSFWorkbook();
+
+		}
+
+		// 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
+		HSSFSheet sheet = wb.createSheet(sheetName);
+		sheet.setColumnWidth((short) 0, 2500);
+		sheet.setColumnWidth((short) 1, 2500);
+		sheet.setColumnWidth((short) 2, 5000);
+		sheet.setColumnWidth((short) 3, 5000);
+		sheet.setColumnWidth((short) 4, 2500);
+		sheet.setColumnWidth((short) 5, 2500);
+		sheet.setColumnWidth((short) 6, 15000);
+		sheet.setColumnWidth((short) 7, 8000);
+		sheet.setColumnWidth((short) 8, 7000);
+		sheet.setColumnWidth((short) 9, 5000);
+		sheet.setColumnWidth((short) 10, 5000);
+		sheet.setColumnWidth((short) 11, 3000);
+		sheet.setColumnWidth((short) 12, 3000);
+		sheet.setColumnWidth((short) 13, 3000);
+		sheet.setColumnWidth((short) 14, 3000);
+		sheet.setColumnWidth((short) 15, 8000);
+
+		//表头样式 1 开始
+		HSSFFont titleFont = wb.createFont();
+		titleFont.setFontName("微软雅黑");
+		titleFont.setFontHeightInPoints((short) 16);// 字号
+		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		// 第四步，创建单元格，并设置值表头 设置表头居中  
+		HSSFCellStyle style = wb.createCellStyle(); // 表格内容样式
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style.setWrapText(true); // 设置换行
+		style.setFont(titleFont);
+		//表头样式2 开始
+		HSSFFont titleFont2 = wb.createFont();
+		titleFont2.setFontName("宋体");
+		titleFont2.setFontHeightInPoints((short) 11);// 字号
+		titleFont2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style2 = wb.createCellStyle(); // 表格内容样式
+		style2.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style2.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style2.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style2.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style2.setWrapText(true); // 设置换行
+		style2.setFont(titleFont2);
+		//内容样式3开始
+		HSSFFont font= wb.createFont();
+		font.setFontName("宋体");
+		font.setFontHeightInPoints((short) 11);// 字号
+		//font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style3 = wb.createCellStyle(); // 表格内容样式
+		style3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style3.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style3.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style3.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style3.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style3.setWrapText(true); // 设置换行
+		style3.setFont(font);
+		
+		// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
+		HSSFRow row = sheet.createRow(0);
+		row.setHeight((short) 800);
+		HSSFCell createCell = row.createCell(0);
+		createCell.setCellValue("2018年10月测试计划井号");
+		createCell.setCellStyle(style);
+		
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 0, 0));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 1, 1));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 2, 2));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 3, 3));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 4, 4));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 5, 5));
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, 6, 7));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 8, 8));
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, 9, 10));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 11, 11));
+		sheet.addMergedRegion(new CellRangeAddress(1, 2, 12, 12));
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, 13, 15));
+		sheet.addMergedRegion(new CellRangeAddress(0,0, 0, 15));
+		
+
+		HSSFRow row1 = sheet.createRow(1);
+		HSSFRow row2 = sheet.createRow(2);
+		// 声明列对象
+		HSSFCell cell = null;
+		// 创建标题
+		for (int i = 0; i < title1.length; i++) {
+			cell = row1.createCell(i);
+			cell.setCellValue(title1[i]);
+			cell.setCellStyle(style2);
+		}
+		
+		for (int i = 0; i < title2.length; i++) {
+			cell = row2.createCell(i);
+			cell.setCellValue(title2[i]);
+			cell.setCellStyle(style2);
+		}
+		//获取措施计划数据
+		List<OilJCJH> datalist = this.oilJCJHService.getOilJCJHReport(site_id, date);
+		int sumWell=0;
+		for (OilJCJH oilJCJH : datalist) {
+			if(oilJCJH.getCs_type_name().equals("小计")){
+				String wellNum = oilJCJH.getWell_name();
+				if(wellNum!=null&&!"".equals(wellNum)){
+					sumWell +=Integer.parseInt(wellNum);
+					oilJCJH.setWell_name(wellNum+"口");
+				}
+			}
+		}
+		OilJCJH oilJCJH2=new OilJCJH();
+		oilJCJH2.setCs_type_name("总计");
+		oilJCJH2.setWell_name(sumWell+"口");
+		datalist.add(oilJCJH2);
+		
+		String xm = "";
+		String testType="";
+		int stratRowNum = 3;
+		int stratRowNumType = 3;
+		// 创建内容
+		for (int i = 0; i < datalist.size(); i++) {
+			//动态合并内容相同的行
+			if(i==0){
+				xm = datalist.get(i).getXm();
+				testType = datalist.get(i).getCs_type_name();
+			}
+			if(xm.equals(datalist.get(i).getXm())){
+				sheet.addMergedRegion(new CellRangeAddress(stratRowNum,i+3,0, 0));
+			}else{
+				xm = datalist.get(i).getXm();
+				stratRowNum=i+3;
+			}
+			
+			
+			if(testType.equals(datalist.get(i).getCs_type_name())){
+				sheet.addMergedRegion(new CellRangeAddress(stratRowNumType,i+3,1, 1));
+			}else{
+				testType = datalist.get(i).getCs_type_name();
+				stratRowNumType=i+3;
+			}
+			row = sheet.createRow(i + 3);
+			HSSFCell createCell0 = row.createCell(0);
+			HSSFCell createCell1 = row.createCell(1);
+			HSSFCell createCell2 = row.createCell(2);
+			HSSFCell createCell3 = row.createCell(3);
+			HSSFCell createCell4 = row.createCell(4);
+			HSSFCell createCell5 = row.createCell(5);
+			HSSFCell createCell6 = row.createCell(6);
+			HSSFCell createCell7 = row.createCell(7);
+			HSSFCell createCell8 = row.createCell(8);
+			HSSFCell createCell9 = row.createCell(9);
+			HSSFCell createCell10 = row.createCell(10);
+			HSSFCell createCell11= row.createCell(11);
+			HSSFCell createCell12= row.createCell(12);
+			HSSFCell createCell13 = row.createCell(13);
+			HSSFCell createCell14= row.createCell(14);
+			HSSFCell createCell15= row.createCell(15);
+			createCell0.setCellValue(datalist.get(i).getXm());
+			createCell1.setCellValue(datalist.get(i).getCs_type_name());
+			createCell2.setCellValue(datalist.get(i).getWell_name());
+			createCell3.setCellValue(datalist.get(i).getWell_section());
+			createCell4.setCellValue(datalist.get(i).getThickness() == null?"":datalist.get(i).getThickness()+"");
+			createCell5.setCellValue(datalist.get(i).getPlies_num() == null?"":datalist.get(i).getPlies_num()+"");
+			createCell6.setCellValue(datalist.get(i).getCs_purpose());
+			createCell7.setCellValue(datalist.get(i).getCs_claim());
+			createCell8.setCellValue(datalist.get(i).getLast_success_date());
+			createCell9.setCellValue(datalist.get(i).getRecently_fail_date());
+			createCell10.setCellValue(datalist.get(i).getRecently_revise_mesg());
+			createCell11.setCellValue(datalist.get(i).getLevel_demand()==null?"":datalist.get(i).getLevel_demand()+"");
+			createCell12.setCellValue(datalist.get(i).getTc_date());
+			createCell13.setCellValue(datalist.get(i).getFk_cd_date());
+			createCell14.setCellValue(datalist.get(i).getWcd_mesg());
+			createCell15.setCellValue(datalist.get(i).getSjyy());
+			createCell0.setCellStyle(style3);
+			createCell1.setCellStyle(style3);
+			createCell2.setCellStyle(style3);
+			createCell3.setCellStyle(style3);
+			createCell4.setCellStyle(style3);
+			createCell5.setCellStyle(style3);
+			createCell6.setCellStyle(style3);
+			createCell7.setCellStyle(style3);
+			createCell8.setCellStyle(style3);
+			createCell9.setCellStyle(style3);
+			createCell10.setCellStyle(style3);
+			createCell11.setCellStyle(style3);
+			createCell12.setCellStyle(style3);
+			createCell13.setCellStyle(style3);
+			createCell14.setCellStyle(style3);
+			createCell15.setCellStyle(style3);
+		}
+
+		OutputStream output = response.getOutputStream();
+		response.reset();
+		response.setHeader("Content-disposition","attachment; filename=ceshijihua.xls");
+		response.setContentType("application/msexcel");
+		wb.write(output);
+		output.flush();
+		output.close();
+	}
+	
+	
+	/**
+	 * 导出数据
+	 * @param oilJCJH
+	 * @param page
+	 * @param response
+	 * @param fileName
+	 */
+	@RequestMapping("/dwnloadQueryData")
+	public void dwnloadQueryData(OilJCJH oilJCJH,Page<List<OilJCJH>> page,HttpServletResponse response,String fileName){
+		//获取配注的计划信息
+		Map<String,Object> map = this.oilJCJHService.getOilJCJHList(oilJCJH, page);
+		List<OilJCJH> datalist = (List<OilJCJH>)map.get("data"); 
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+        if(fileName ==  null) {
+        	fileName = "油井监测计划数据导出" ;//设置要导出的文件的名字
+        }
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+        String[] headers = { "工区", "油藏", "井名", "测试内容","测试类型","措施计划月份","生产井段(m)","厚度(m)","层数(t)","测试目的","测试要求","上次测成时间",
+        		"(最近一次)未测成时间","(最近一次整改情况","需求程度","提出日期","出单日期","未出单原因","测成日期","未测成原因","提交状态","审核状态"};
+        //设置列宽
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        sheet.setColumnWidth(6, 35*150);
+        sheet.setColumnWidth(7, 35*150);
+        sheet.setColumnWidth(8, 35*150);
+        sheet.setColumnWidth(9, 35*150);
+        sheet.setColumnWidth(10, 35*150);
+        sheet.setColumnWidth(11, 35*150);
+        sheet.setColumnWidth(12, 35*150);
+        sheet.setColumnWidth(13, 35*150);
+        sheet.setColumnWidth(14, 35*150);
+        sheet.setColumnWidth(15, 35*150);
+        sheet.setColumnWidth(16, 35*150);
+        sheet.setColumnWidth(17, 35*150);
+        sheet.setColumnWidth(18, 35*150);
+        sheet.setColumnWidth(19, 35*150);
+        sheet.setColumnWidth(20, 35*150);
+        sheet.setColumnWidth(21, 35*150);
+        //headers表示excel表中第一行的表头
+
+    	//表头样式2 开始
+		HSSFFont titleFont2 = workbook.createFont();
+		titleFont2.setFontName("宋体");
+		titleFont2.setFontHeightInPoints((short) 11);// 字号
+		titleFont2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style2 = workbook.createCellStyle(); // 表格内容样式
+		style2.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style2.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style2.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style2.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style2.setWrapText(true); // 设置换行
+		style2.setFont(titleFont2);
+        
+		//内容样式3开始
+		HSSFFont font= workbook.createFont();
+		font.setFontName("宋体");
+		font.setFontHeightInPoints((short) 11);// 字号
+		//font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style3 = workbook.createCellStyle(); // 表格内容样式
+		style3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style3.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style3.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style3.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style3.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style3.setWrapText(true); // 设置换行
+		style3.setFont(font);
+		
+        HSSFRow row = sheet.createRow(0);
+        
+        //在excel表中添加表头
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+           cell.setCellStyle(style2);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (OilJCJH welltmp : datalist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(welltmp.getSite_name());
+            row1.createCell(1).setCellValue(welltmp.getYc_name());
+            row1.createCell(2).setCellValue(welltmp.getWell_name());
+            row1.createCell(3).setCellValue(welltmp.getCs_explaim());
+            row1.createCell(4).setCellValue(welltmp.getCs_type_name());
+            row1.createCell(5).setCellValue(welltmp.getStime());
+            row1.createCell(6).setCellValue(welltmp.getWell_section());
+            row1.createCell(7).setCellValue(welltmp.getThickness());
+            row1.createCell(8).setCellValue(welltmp.getPlies_num()==null?"":welltmp.getPlies_num()+"");
+            row1.createCell(9).setCellValue(welltmp.getCs_purpose());
+            row1.createCell(10).setCellValue(welltmp.getCs_claim());
+            row1.createCell(11).setCellValue(welltmp.getLast_success_date());
+            row1.createCell(12).setCellValue(welltmp.getRecently_fail_date());
+            row1.createCell(13).setCellValue(welltmp.getRecently_revise_mesg());
+            row1.createCell(14).setCellValue(welltmp.getLevel_demand()==null?"":welltmp.getLevel_demand()+"");
+            row1.createCell(15).setCellValue(welltmp.getTc_date());
+            row1.createCell(16).setCellValue(welltmp.getFk_cd_date());
+            row1.createCell(17).setCellValue(welltmp.getWcd_mesg());
+            row1.createCell(18).setCellValue(welltmp.getSuccess_date());
+            row1.createCell(19).setCellValue(welltmp.getFail_mesg());
+            row1.createCell(20).setCellValue(welltmp.getTj_status());
+            row1.createCell(21).setCellValue(welltmp.getSh_status());
+            
+            rowNum++;
+        }
+
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		response.setContentType("application/octet-stream");
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try {
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+}

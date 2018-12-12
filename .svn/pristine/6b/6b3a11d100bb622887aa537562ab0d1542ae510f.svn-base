@@ -1,0 +1,27 @@
+package com.hrxt.mapper;
+
+import java.util.Map;
+/**
+ * 获取 心井生产运行科  信息
+ * @author ZhaoQin
+ *
+ */
+public interface OilJCJHMapper {
+	
+	
+	String p_get_oil_jcjh(Map<String, Object> param);
+	
+	
+	/**
+	 *  插入或者更新  oilJCJH
+	 * @param param
+	 * @return
+	 */
+	String p_jcjh_insert_or_update(Map<String, Object> param);
+	
+	
+
+	Integer p_dzs_del_oil_jcjh(Map<String, Object> param);
+	
+	
+}

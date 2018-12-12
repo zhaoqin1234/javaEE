@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.RoleMapper">
+
+	<insert id="insertRole" parameterType="Role">
+		insert into 
+		AUTH_ROLE(
+			id,
+			name,
+			deptId,
+			mark) 
+		values(
+			#{id},
+			#{name},
+			#{deptId},
+			#{mark})
+	</insert>
+	
+	<delete id="deleteRole" parameterType="Role">
+		delete 
+		from AUTH_ROLE 
+		where id = #{id}
+	</delete>
+	<delete id="deleteRoleById" parameterType="String">
+		delete 
+		from AUTH_ROLE 
+		where id = #{id, 			mode=IN, jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteRoleByIds" parameterType="String">
+		delete 
+		from AUTH_ROLE 
+		where id in( #{value} ) 
+	</delete>	
+
+
+	<update id="updateRole" parameterType="Role">
+		update AUTH_ROLE 
+		set 
+			id=#{id} ,
+			name=#{name} ,
+			deptId=#{deptId} ,
+			mark=#{mark}
+		where 
+			id=#{id}
+	</update>
+	
+
+	<select id="getRoles" parameterType="Role" resultType="Role">
+		select 	r.id,
+				r.name,
+				r.deptId,
+				r.mark,
+				d.name deptName
+		from 
+			AUTH_ROLE r,
+			AUTH_DEPTMENT d
+		WHERE r.deptid = d.id
+			<if test="id != null and id != ''">
+				and r.id = #{id}
+			</if>
+			<if test="deptId != null and deptId != ''">
+				and r.deptId = #{deptId}
+			</if>
+			
+	</select>
+	
+	<select id="getRolesByUser" parameterType="User" resultType="Role">
+		select 
+			distinct r.id,
+			r.name,
+			r.deptId,
+			r.mark 
+		from 
+			AUTH_ROLE r,
+			AUTH_USER_ROLE ur,
+			AUTH_USER u
+		where 
+			r.id =ur.role_id 
+		<if test="id != null and id != ''">
+			and ur.user_id = #{id, mode=IN, jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<select id="getRoleByRole" parameterType="Role" resultType="Role">
+		select id,name,deptId,mark 
+		from AUTH_ROLE 
+		where 1=1 
+		<if test="id != null and id != ''">
+			and id = #{id, mode=IN, jdbcType=VARCHAR}
+		</if>
+		
+	</select>
+
+
+	<delete id="deleteUser_roleTableByUserId"  >
+		delete 
+		from AUTH_USER_ROLE 
+		where user_id in( #{value, mode=IN, jdbcType=VARCHAR} ) 
+	</delete>
+	
+	<insert id="insertUser_roleTable" parameterType="java.util.Map">
+		insert into 
+		AUTH_USER_ROLE(
+			user_id,
+			role_id
+			) 
+		values(
+			#{user_id,mode=IN, jdbcType=VARCHAR},
+			#{role_id,mode=IN, jdbcType=VARCHAR}
+			)
+	</insert>
+
+
+</mapper>

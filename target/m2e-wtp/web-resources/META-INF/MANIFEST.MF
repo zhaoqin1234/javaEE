@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: 33-spring-boot-mybatis-oracle
+Implementation-Version: 0.0.2-SNAPSHOT
+Built-By: ZhaoQin
+Implementation-Vendor-Id: com.hrxt
+Build-Jdk: 1.8.0_144
+Implementation-URL: http://projects.spring.io/spring-boot/33-spring-bo
+ ot-mybatis-oracle/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

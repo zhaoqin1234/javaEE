@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.JCJHOptionMapper">
+
+	<resultMap id="jCJHOption_Water_Map" type="com.hrxt.pojo.JCJHOptionWater">
+		<result property="jcjh_id" 		jdbcType="VARCHAR" column="jcjh_id"/>
+		<result property="jcjh_name" 	jdbcType="VARCHAR" column="jcjh_name"/>
+		<result property="start_using" 	jdbcType="VARCHAR" column="start_using"/>
+		<result property="sort_order" 	jdbcType="VARCHAR" column="sort_order"/>
+		<result property="joint_flag" 	jdbcType="VARCHAR" column="joint_flag"/>
+	</resultMap>
+	<resultMap id="jCJHOption_Oil_Map" type="com.hrxt.pojo.JCJHOptionWater">
+		<result property="jcjh_id" 		jdbcType="VARCHAR" column="jcjh_id"/>
+		<result property="jcjh_name" 	jdbcType="VARCHAR" column="jcjh_name"/>
+		<result property="start_using" 	jdbcType="VARCHAR" column="start_using"/>
+		<result property="sort_order" 	jdbcType="VARCHAR" column="sort_order"/>
+		<result property="joint_flag" 	jdbcType="VARCHAR" column="joint_flag"/>
+	</resultMap>
+	
+	
+	
+	
+	<select id="getJCJHOptionWater" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_water_jcjh_code_get(
+		  			#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=jCJHOption_Water_Map}
+			)
+		 ]]>
+	</select>
+	
+	<select id="getJCJHOptionOil" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_well_jcjh_get(
+		  			#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=jCJHOption_Oil_Map}
+			)
+		 ]]>
+	</select>
+	
+	
+	<select id="insertOrUpdateJCJHOptionWater" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_water_jcjh_code_insorup(
+					#{i_jcjh_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_jcjh_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_start_using, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_out_numb,		mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 			mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	
+	<select id="insertOrUpdateJCJHOptionOil" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_well_jcjh_insorup(
+					#{i_jcjh_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_jcjh_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_start_using, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_out_numb,		mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 			mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	
+	
+	<select id="deleteJCJHOptionWater" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_water_jcjh_code_delete(
+					#{i_jcjh_id, 	mode=IN, jdbcType=VARCHAR},
+					#{o_out_numb,	mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+
+
+	<select id="deleteJCJHOptionOil" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_well_jcjh_delete(
+					#{i_jcjh_id, 	mode=IN, jdbcType=VARCHAR},
+					#{o_out_numb,	mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+
+	
+	
+</mapper>

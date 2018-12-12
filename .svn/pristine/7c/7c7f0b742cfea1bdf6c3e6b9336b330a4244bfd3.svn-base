@@ -1,0 +1,34 @@
+package com.hrxt.mapper;
+
+import java.util.List;
+
+import com.hrxt.pojo.Button;
+import com.hrxt.pojo.Menu;
+import com.hrxt.pojo.Role;
+import com.hrxt.pojo.User;
+
+public interface ButtonMapper {
+	
+	public int insertButton(Button button);
+
+	public int updateButton(Button button);
+	
+	public int deleteButtonByButton(Button button);
+	
+	public int deleteButtonById(String id);
+	
+	public int deleteButtonByIds(String [] ids);
+	
+	public List<Button> getButtons();
+	
+	public List<Button> getButtonsByUser(User user);
+	
+	public List<Button> getButtonsByRole(Role role);
+	
+	public List<Button> getButtonsByMenu(Menu menu);
+	
+	public Button getButtonByButton(Button button);
+	
+	public Button getButtonById(String id);
+
+}

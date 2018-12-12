@@ -1,0 +1,1176 @@
+package com.hrxt.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.alibaba.fastjson.JSON;
+import com.hrxt.pojo.DzsPzReportSummarkRemark;
+import com.hrxt.pojo.Dzs_pz_report_summary;
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.Site;
+import com.hrxt.pojo.YpzTJ;
+import com.hrxt.service.DzsPzReportSummarkRemarkService;
+import com.hrxt.service.MonthPZService;
+import com.hrxt.service.OrgService;
+import com.hrxt.service.WellService;
+import com.hrxt.utils.ExcelUtil;
+import com.hrxt.utils.JSONutils;
+import com.hrxt.utils.POIReadExcel;
+
+
+@Controller
+@RequestMapping("/monthPZ")
+public class MonthPZController {
+
+	@Autowired
+	private MonthPZService monthPZService;
+	
+	@Autowired
+	private WellService wellService;
+	@Autowired
+	private DzsPzReportSummarkRemarkService dzsPzReportSummarkRemarkService;
+	
+	@Autowired
+	private OrgService orgService;
+	
+	@RequestMapping("/insert")
+	@ResponseBody
+	public String insetMonthPZ(MonthPZ monthPZ){	
+		Map<String,Object> map = this.monthPZService.insertMonthPZ(monthPZ);
+		return JSON.toJSONString(map);
+	}
+	
+	@RequestMapping("/update")
+	@ResponseBody
+	public String updateMonthPZ(MonthPZ monthPZ){	
+		Map<String,Object> map = this.monthPZService.updateMonthPZ(monthPZ);
+		return JSON.toJSONString(map);
+	}
+	
+	@RequestMapping("/insertList")
+	@ResponseBody
+	public String insetMonthPZList( MonthPZ monthPZ){	
+		System.out.println(JSONutils.Object2String(monthPZ));
+		List<MonthPZ> list11 = new ArrayList<MonthPZ>();
+		list11.add(monthPZ);
+		List<String> list = monthPZService.batchInsertOrUpdate(list11);
+		return JSON.toJSONString(list);
+	}
+	
+	
+	@RequestMapping("/delOneMonthPZ")
+	@ResponseBody
+	public String delOneMonthPZ(String seq){	
+		Map<String,Object> map = this.monthPZService.delOneYPZBB(seq);
+		return JSON.toJSONString(map);
+	}
+
+	
+	@RequestMapping("/delMonthPZList")
+	@ResponseBody
+	public String delMonthPZList(String seqlist){	
+		Map<String,Object> map = this.monthPZService.delListYPZBB(seqlist);
+		return JSON.toJSONString(map);
+	}
+	
+	/**
+	 * monthPZ记录审核  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/auditMonthP")
+	@ResponseBody
+	public String auditMonthPZ(String seqlist){	
+		return monthPZService.auditOneYPZBB(seqlist);
+	}
+	
+	@RequestMapping("/unAuditMonthP")
+	@ResponseBody
+	public String unAuditMonthPZ(String seqlist){	
+		return monthPZService.unAuditOneYPZBB(seqlist);
+	}
+	/**
+	 * monthPZ【提交】  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/submittMonthP")
+	@ResponseBody
+	public String submitMonthPZ(String seqlist){	
+		return monthPZService.submitMonthPZ(seqlist);
+	}
+	@RequestMapping("/unSubmittMonthP")
+	@ResponseBody
+	public String unSubmitMonthPZ(String seqlist){	
+		return monthPZService.unSubmitMonthPZ(seqlist);
+	}
+	
+	
+	/**
+	 * 获取配注信息  通过分页
+	 * @param monthPZ
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping("/getMonthPZList")
+	@ResponseBody
+	public String getMonthPZList(MonthPZ monthPZ,Page<List<MonthPZ>> page){	
+		return JSON.toJSONString(monthPZService.getMonthPZList(monthPZ, page));
+	}
+	
+	
+	//    /monthPZ/getMonthPZListjson
+	@RequestMapping("/getMonthPZListjson")
+	@ResponseBody
+	public String getMonthPZListfastJSON(MonthPZ monthPZ,Page<List<MonthPZ>> page){	
+		return JSON.toJSONString(monthPZService.getMonthPZList(monthPZ, page));
+	}
+	
+	
+	
+	/**  /monthPZ/dwnloadTmp
+	 * 下载导入模板        下面的过滤条件  必须填
+	 * 	"site_id", 
+		"yc_id",
+		"stime", 
+		"well_id", 
+	 */
+	@RequestMapping("/dwnloadTmp")
+	public void dwnloadTmpMB(MonthPZ monthPZ,HttpServletResponse response,String fileName){
+		
+		//获取配注的计划信息
+		List<MonthPZ> monthPZlist = this.monthPZService.getMonthPZMB(monthPZ);
+		
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "月配注模板导出";//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注","时间","备注"};
+        
+        //设置列宽
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        
+        //在excel表中添加表头
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (MonthPZ welltmp : monthPZlist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(welltmp.getSite_name());
+            row1.createCell(1).setCellValue(welltmp.getYc_name());
+            row1.createCell(2).setCellValue(welltmp.getWell_name());
+            if(welltmp.getDzpz() != null) {
+            	row1.createCell(3).setCellValue(welltmp.getDzpz());
+            }
+            if(welltmp.getKhpz() != null) {
+            	row1.createCell(4).setCellValue(welltmp.getKhpz());
+            }
+            if(welltmp.getStime() != null) {
+            	row1.createCell(5).setCellValue(welltmp.getStime());
+            }
+            if(welltmp.getMark() != null) {
+            	row1.createCell(6).setCellValue(welltmp.getMark());
+            }
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try {
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	
+	@RequestMapping("/dwnloadQueryData")
+	public void dwnloadQueryData(MonthPZ monthPZ,Page<List<MonthPZ>> page,HttpServletResponse response,String fileName){
+		
+		//获取配注的计划信息
+		Map<String,Object> map = this.monthPZService.getMonthPZList(monthPZ, page);
+		List<MonthPZ> datalist = (List<MonthPZ>)map.get("data"); 
+		
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "月配注模板导出" ;//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注",
+        		"上月考核配注","本月地质与本月考核差值","本月考核与上月考核差值",
+        		"时间","备注"};
+        
+        //设置列宽
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        sheet.setColumnWidth(6, 35*150);
+        sheet.setColumnWidth(7, 35*150);
+        sheet.setColumnWidth(8, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        
+        //在excel表中添加表头
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (MonthPZ welltmp : datalist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(welltmp.getSite_name());
+            row1.createCell(1).setCellValue(welltmp.getYc_name());
+            row1.createCell(2).setCellValue(welltmp.getWell_name());
+            if(welltmp.getDzpz() != null) {
+            	row1.createCell(3).setCellValue(welltmp.getDzpz());
+            }
+            if(welltmp.getKhpz() != null) {
+            	row1.createCell(4).setCellValue(welltmp.getKhpz());
+            }
+            if(welltmp.getLast_kh() != null) {
+            	row1.createCell(5).setCellValue(welltmp.getLast_kh());
+            }
+            
+            if(welltmp.getCz_sj_jh() != null) {
+            	row1.createCell(6).setCellValue(welltmp.getCz_sj_jh());
+            }
+            if(welltmp.getCz_sj_sj() != null) {
+            	row1.createCell(7).setCellValue(welltmp.getCz_sj_sj());
+            }
+            
+            if(welltmp.getStime() != null) {
+            	row1.createCell(8).setCellValue(welltmp.getStime());
+            }
+            if(welltmp.getMark() != null) {
+            	row1.createCell(9).setCellValue(welltmp.getMark());
+            }
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try {
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	
+	//excel批量上传数据     /monthPZ/excelUpdateMonthPZ
+	/**
+	 * @param monthPZ
+	 * @param fileMult
+	 * @param fileName
+	 * @return
+	 */
+	@RequestMapping("/excelUpdateMonthPZ")
+	public String updateMonthPZList(MultipartFile fileMult,String fileName){	
+		List<Map<String, Object>> list = null;
+		if(fileMult==null) {
+			//System.out.println("没有数据流");
+			return "没有数据流";
+		}
+		try {
+			String name =  fileMult.getOriginalFilename();
+			InputStream is = fileMult.getInputStream();
+			//System.out.println(name+is);
+			String [] fileds = {"site_name","yc_name","well_name","dzpz","khpz","stime","mark"};
+			if(is != null) {
+				list = ExcelUtil.getDataListByexcel(0, 1, is, name, fileds);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			MonthPZ monthPz = new MonthPZ();
+			monthPz.setSite_name((String)map.get("site_name"));
+			monthPz.setYc_name((String)map.get("yc_name"));
+			monthPz.setDzpz((Integer.parseInt((String) map.get("dzpz"))));
+			monthPz.setWell_name((String)map.get("well_name"));
+			monthPz.setStime((String)map.get("stime"));
+			monthPz.setMark((String)map.get("mark"));
+			System.out.println(JSONutils.Object2String(map));
+			monthPZService.insertOrUpdateByExcel(monthPz);
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * 根据id添加或更新月配注总结 备注信息
+	 */
+	@RequestMapping("saveDzsPzReportSummarkRemark")
+	@ResponseBody
+	public String saveDzsPzReportSummarkRemark(String remark,String verifier,String approver,String date,String summarkRemarkId){
+		DzsPzReportSummarkRemark dzsPzReportSummarkRemark=new DzsPzReportSummarkRemark();
+		dzsPzReportSummarkRemark.setSummarkRemark(remark);
+		dzsPzReportSummarkRemark.setSummarkVerifier(verifier);
+		dzsPzReportSummarkRemark.setSummarkApprover(approver);
+		dzsPzReportSummarkRemark.setSummarkDate(date);
+		int i=0;
+		if(summarkRemarkId==null||"".equals(summarkRemarkId)||"undefined".equals(summarkRemarkId)){
+			dzsPzReportSummarkRemark.setSummarkRemarkId(UUID.randomUUID().toString());
+			 i = dzsPzReportSummarkRemarkService.insterDzsPzReportSummarkRemark(dzsPzReportSummarkRemark);
+		}else{
+			i = dzsPzReportSummarkRemarkService.updateSummarkremarkByDate(dzsPzReportSummarkRemark, date);
+		}
+		return i+"";
+	}
+	
+	
+	
+	/**
+	 * 月配注报表 页面显示
+	 */
+	@RequestMapping("getMonthPZBySiteIdAndDate")
+	@ResponseBody
+	public List<MonthPZ> getMonthPZBySiteIdAndDate(String [] sietIdArr,String date){
+		if(sietIdArr.length==0||sietIdArr==null){
+			List<Site> orglist = this.orgService.getPublicSite();
+			List<String> siteIdList=new ArrayList<>();
+			for (Site site : orglist) {
+				siteIdList.add(site.getSite_id());
+			}
+			String[] array = new String[siteIdList.size()];
+			String[] orgArr=siteIdList.toArray(array);
+			sietIdArr=orgArr;
+		}
+		
+		
+		
+		List<MonthPZ> monthPZList=new ArrayList<>();
+		List<YpzTJ> ypzTjList=new ArrayList<>();
+		for (int i=0;i<sietIdArr.length;i++) {
+			Map<String, Object> dataList = monthPZService.getMonthPZBySiteIdAndDate(sietIdArr[i],date);
+			List<MonthPZ> thisMonthPZList =(List<MonthPZ>)dataList.get("monthPzList");
+			for (MonthPZ monthPZ : thisMonthPZList) {
+				monthPZList.add(monthPZ);
+			}
+		}
+		
+		return monthPZList;
+	}
+	
+	
+	
+	/**
+	 * excel 显示到html页面  
+	 * 月配注报表 文字页面显示
+	 * @throws ParseException 
+	 */
+		@RequestMapping("getMonthPZBySiteIdAndDateExcelToHtml")
+		@ResponseBody
+		public String getMonthPZBySiteIdAndDateExcelToHtml(String [] sietIdArr,String date) throws ParseException{
+			if(sietIdArr.length==0||sietIdArr==null){
+				List<Site> orglist = this.orgService.getPublicSite();
+				List<String> siteIdList=new ArrayList<>();
+				for (Site site : orglist) {
+					siteIdList.add(site.getSite_id());
+				}
+				String[] array = new String[siteIdList.size()];
+				String[] orgArr=siteIdList.toArray(array);
+				sietIdArr=orgArr;
+			}
+			
+			
+			HSSFWorkbook wb = null;
+			// 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+			if (wb == null) {
+				wb = new HSSFWorkbook();
+			}
+			// 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
+			HSSFSheet sheet = wb.createSheet("文字");
+			String sheetName1 = "文字";
+		List<YpzTJ> ypzTjList=new ArrayList<>();
+	for (int i=0;i<sietIdArr.length;i++) {
+			Map<String, Object> dataList = monthPZService.getMonthPZBySiteIdAndDate(sietIdArr[i],date);
+			List<YpzTJ> thisYpzTjList =(List<YpzTJ>)dataList.get("ypzTjList");
+			for (YpzTJ ypzTJ : thisYpzTjList) {
+				ypzTjList.add(ypzTJ);
+			}
+		}
+		List<Dzs_pz_report_summary> allDzspzreportsummary = monthPZService.getAllDzspzreportsummary();
+		
+			int zydzpz=0;//自营地质配注
+			int zykhpz=0; //自营考核配注
+			int zyhySum=0; //自营灰岩合计
+			int zysySum=0; //自营沙岩合计
+			int khhySum=0; //考核灰岩合计
+			int khsySum=0; //考核沙岩合计
+			int hzkfdzpz=0; //合作开发地质配注
+			int hzkfkhpz=0; //合作开发考核配注
+			for (YpzTJ ypzTJ : ypzTjList) {
+				if(ypzTJ.getType().equals("2")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+					zydzpz+=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+					zykhpz+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+				}
+				if(ypzTJ.getType().equals("0")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+					zyhySum+=Integer.parseInt(ypzTJ.getDzpz() !=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+					khhySum+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+					
+				}
+				if(ypzTJ.getType().equals("1")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+					zysySum+=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+					khsySum+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+				}
+				
+				if("ZLtj480M74".equals(ypzTJ.getOrg_id())){
+					hzkfdzpz=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+					hzkfkhpz=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+				}
+			}
+			SimpleDateFormat fmt2=new SimpleDateFormat("yyyy-MM");
+			SimpleDateFormat fmt3=new SimpleDateFormat("yyyy年MM月");
+			Date parse = fmt2.parse(date);
+			String format = fmt3.format(parse);
+			// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
+			HSSFRow row = sheet.createRow(0);
+			HSSFCell createCell = row.createCell(0);
+			createCell.setCellValue(format);
+			
+			HSSFRow row1 = sheet.createRow(1);
+			row1.setHeight((short) 1200);
+			HSSFCell row1CreateCell = row1 .createCell(0);
+			row1CreateCell.setCellValue("第三采油厂油田配注公报");
+			 
+			sheet.addMergedRegion(new CellRangeAddress(0,0, 0, 6));
+			
+			sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 6));
+			sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 6));
+			sheet.addMergedRegion(new CellRangeAddress(15, 15, 1, 8));
+			
+		for (int i = 0; i < allDzspzreportsummary.size(); i++) {
+				HSSFRow row2 = sheet.createRow(i+2);
+				row2.setHeight((short) 900);
+				HSSFCell row2CreateCell = row2 .createCell(0);
+				HSSFCell row2CreateCell1 = row2 .createCell(1);
+				row2CreateCell.setCellValue(allDzspzreportsummary.get(i).getSerialNumber());
+				row2CreateCell1.setCellValue(allDzspzreportsummary.get(i).getNote());
+			}
+					
+			HSSFRow row10 = sheet.createRow(10);
+			HSSFRow row11 = sheet.createRow(11);
+			HSSFRow row12 = sheet.createRow(12);
+			HSSFRow row13 = sheet.createRow(13);
+			HSSFRow row14 = sheet.createRow(14);
+			HSSFRow row15 = sheet.createRow(15);
+			HSSFRow row16 = sheet.createRow(16);
+			HSSFRow row17 = sheet.createRow(17);
+			HSSFRow row18 = sheet.createRow(18);
+			HSSFCell row10CreateCell1 = row10.createCell(1);
+			HSSFCell row15CreateCell1 = row15.createCell(1);
+			HSSFCell row16CreateCell1 = row16.createCell(1);
+			HSSFCell row15CreateCell5 = row15.createCell(5);
+			HSSFCell row16CreateCell5 = row16.createCell(5);
+			HSSFCell row17CreateCell6 = row17.createCell(6);
+			HSSFCell row18CreateCell6 = row18.createCell(6);
+			
+			HSSFCell row11CreateCell1 = row11.createCell(1);
+			HSSFCell row12CreateCell1 = row12.createCell(1);
+			HSSFCell row13CreateCell1 = row13.createCell(1);
+			HSSFCell row11CreateCell2 = row11.createCell(2);
+			HSSFCell row12CreateCell2 = row12.createCell(2);
+			HSSFCell row13CreateCell2 = row13.createCell(2);
+			HSSFCell row11CreateCell3 = row11.createCell(3);
+			HSSFCell row12CreateCell3 = row12.createCell(3);
+			HSSFCell row13CreateCell3 = row13.createCell(3);
+			HSSFCell row11CreateCell4 = row11.createCell(4);
+			HSSFCell row12CreateCell4 = row12.createCell(4);
+			HSSFCell row13CreateCell4 = row13.createCell(4);
+			HSSFCell row11CreateCell5 = row11.createCell(5);
+			HSSFCell row12CreateCell5 = row12.createCell(5);
+			HSSFCell row13CreateCell5 = row13.createCell(5);
+			HSSFCell row11CreateCell6 =row11.createCell(6);
+			HSSFCell row12CreateCell6 =row12.createCell(6);
+			HSSFCell row13CreateCell6 =row13.createCell(6);
+			HSSFCell row11CreateCell7 =row11.createCell(7);
+			HSSFCell row12CreateCell7 =row12.createCell(7);
+			HSSFCell row13CreateCell7 =row13.createCell(7);
+			//总配注计算
+			row11CreateCell1.setCellValue("自营:");
+			row12CreateCell1.setCellValue("自营:");
+			row13CreateCell1.setCellValue("合作开发:");
+			row11CreateCell2.setCellValue("地质配注:");
+			row12CreateCell2.setCellValue("考核配注:");
+			row13CreateCell2.setCellValue("地质配注:");
+			row11CreateCell3.setCellValue(zydzpz);
+			row12CreateCell3.setCellValue(zykhpz);
+			row13CreateCell3.setCellValue(hzkfdzpz);
+			row11CreateCell4.setCellValue("其中灰岩:");
+			row12CreateCell4.setCellValue("其中灰岩:");
+			row13CreateCell4.setCellValue("考核配注:");
+			row11CreateCell5.setCellValue(zyhySum);
+			row12CreateCell5.setCellValue(khhySum);
+			row13CreateCell5.setCellValue(hzkfkhpz);
+			row11CreateCell6.setCellValue("砂岩:\t\t\t\t\t\t\t"+zysySum);
+			row12CreateCell6.setCellValue("砂岩:\t\t\t\t\t\t\t"+khsySum);
+			//row13CreateCell6.setCellValue("砂岩:");
+//			row13CreateCell7.setCellValue("");
+			
+			//按月份查询备注
+			List<DzsPzReportSummarkRemark> summarkRemark = dzsPzReportSummarkRemarkService.getSummarkRemark(date);
+			String summarkRemarkId=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkRemarkId():"";
+			String remark=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkRemark():"备注...";
+			String verifier=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkVerifier():"";
+			String approver=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkApprover():"";
+			row15CreateCell1.setCellValue("<div><br><br> <input type='hidden' id='summarkRemarkId'value='"+summarkRemarkId+"'><input name='remark' id='remark' type='text' style='width:830px;height:50px' value='"+remark+"'/><br><br></div>");
+
+			SimpleDateFormat fmt=new SimpleDateFormat("yyyy年MM月dd日");
+			String date2 = fmt.format(new Date());
+			//底部内容
+					row16CreateCell1.setCellValue("审核人: <div><input name='verifier' id='verifier' type='text' style='width:200px;height:30px' value='"+verifier+"' /></div>");
+					row16CreateCell5.setCellValue("审批人: <div><input name='approver' id='approver' type='text' style='width:200px;height:30px' value='"+approver+"'/></div>");
+					row17CreateCell6.setCellValue(" 第三采油厂地质研究所 ");
+					row18CreateCell6.setCellValue(date2);
+			String excelInfo = POIReadExcel.getExcelInfo(wb,false);
+			
+			return excelInfo;
+		}
+		
+	
+	/**
+	 * 月配注报表
+	 * @throws IOException 
+	 * @throws ParseException 
+	 * 
+	 */
+	@RequestMapping("downloadMothPZBB")
+	@ResponseBody
+	public String downloadMothPZBB(HttpServletResponse response,String [] sietIdArr,String [] sietName,String date) throws IOException, ParseException{
+		if(sietIdArr.length==0||sietIdArr==null){
+			List<Site> orglist = this.orgService.getPublicSite();
+			List<String> siteIdList=new ArrayList<>();
+			for (Site site : orglist) {
+				siteIdList.add(site.getSite_id());
+			}
+			String[] array = new String[siteIdList.size()];
+			String[] orgArr=siteIdList.toArray(array);
+			sietIdArr=orgArr;
+		}
+		
+		HSSFWorkbook wb = null;
+		// 第一步，创建一个HSSFWorkbook，对应一个Excel文件
+		if (wb == null) {
+			wb = new HSSFWorkbook();
+
+		}
+
+		// 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
+		HSSFSheet sheet = wb.createSheet("文字");
+		
+		String sheetName1 = "文字";
+	List<YpzTJ> ypzTjList=new ArrayList<>();
+	for (int i=0;i<sietIdArr.length;i++) {
+		Map<String, Object> dataList = monthPZService.getMonthPZBySiteIdAndDate(sietIdArr[i],date);
+		List<MonthPZ> monthPZList =(List<MonthPZ>)dataList.get("monthPzList");
+		List<YpzTJ> thisYpzTjList =(List<YpzTJ>)dataList.get("ypzTjList");
+		if(monthPZList.size()!=0&&monthPZList!=null){
+			createSheet(wb,monthPZList.get(0).getSite_name(),monthPZList.get(0).getSite_name(),monthPZList,thisYpzTjList);
+		}
+		for (YpzTJ ypzTJ : thisYpzTjList) {
+			ypzTjList.add(ypzTJ);
+		}
+	}
+	List<Dzs_pz_report_summary> allDzspzreportsummary = monthPZService.getAllDzspzreportsummary();
+	
+		int zydzpz=0;//自营地质配注
+		int zykhpz=0; //自营考核配注
+		int zyhySum=0; //自营灰岩合计
+		int zysySum=0; //自营沙岩合计
+		int khhySum=0; //考核灰岩合计
+		int khsySum=0; //考核沙岩合计
+		int hzkfdzpz=0; //合作开发地质配注
+		int hzkfkhpz=0; //合作开发考核配注
+		for (YpzTJ ypzTJ : ypzTjList) {
+			if(ypzTJ.getType().equals("2")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+				zydzpz+=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+				zykhpz+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+			}
+			if(ypzTJ.getType().equals("0")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+				zyhySum+=Integer.parseInt(ypzTJ.getDzpz() !=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+				khhySum+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+				
+			}
+			if(ypzTJ.getType().equals("1")&&!"ZLtj480M74".equals(ypzTJ.getOrg_id())){
+				zysySum+=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+				khsySum+=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+			}
+			
+			if("ZLtj480M74".equals(ypzTJ.getOrg_id())){
+				hzkfdzpz=Integer.parseInt(ypzTJ.getDzpz()!=null&&!ypzTJ.getDzpz().equals("")?ypzTJ.getDzpz():"0");
+				hzkfkhpz=Integer.parseInt(ypzTJ.getKhpz()!=null&&!ypzTJ.getKhpz().equals("")?ypzTJ.getKhpz():"0");
+			}
+		}
+		sheet.setColumnWidth((short) 0, 2500);
+		sheet.setColumnWidth((short) 1, 2500);
+		sheet.setColumnWidth((short) 2, 5000);
+		sheet.setColumnWidth((short) 3, 5000);
+		sheet.setColumnWidth((short) 4, 2500);
+		sheet.setColumnWidth((short) 5, 2500);
+		sheet.setColumnWidth((short) 6, 15000);
+		sheet.setColumnWidth((short) 7, 8000);
+		sheet.setColumnWidth((short) 8, 7000);
+		sheet.setColumnWidth((short) 9, 5000);
+		sheet.setColumnWidth((short) 10, 5000);
+		sheet.setColumnWidth((short) 11, 3000);
+		sheet.setColumnWidth((short) 12, 3000);
+		sheet.setColumnWidth((short) 13, 3000);
+		sheet.setColumnWidth((short) 14, 3000);
+		sheet.setColumnWidth((short) 15, 8000);
+
+		//表头样式 1 开始
+		HSSFFont titleFont = wb.createFont();
+		titleFont.setFontName("Times New Roman");
+		titleFont.setFontHeightInPoints((short) 26);// 字号
+		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		// 第四步，创建单元格，并设置值表头 设置表头居中  
+		HSSFCellStyle style = wb.createCellStyle(); // 表格内容样式
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style.setBorderBottom(HSSFCellStyle.BORDER_NONE);// 下边框
+		style.setBorderLeft(HSSFCellStyle.BORDER_NONE);// 左边框
+		style.setBorderRight(HSSFCellStyle.BORDER_NONE);// 右边框
+		style.setBorderTop(HSSFCellStyle.BORDER_NONE);// 上边框
+		style.setWrapText(true); // 设置换行
+		style.setFont(titleFont);
+	
+		//内容样式3开始
+		HSSFFont font= wb.createFont();
+		font.setFontName("仿宋_GB2312");
+		font.setFontHeightInPoints((short) 16);// 字号
+		//font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style3 = wb.createCellStyle(); // 表格内容样式
+		style3.setAlignment(HSSFCellStyle.ALIGN_LEFT); // 创建一个居左格式
+		style3.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style3.setBorderBottom(HSSFCellStyle.BORDER_NONE);// 下边框
+		style3.setBorderLeft(HSSFCellStyle.BORDER_NONE);// 左边框
+		style3.setBorderRight(HSSFCellStyle.BORDER_NONE);// 右边框
+		style3.setBorderTop(HSSFCellStyle.BORDER_NONE);// 上边框
+		style3.setWrapText(true); // 设置换行
+		style3.setFont(font);
+		
+		//内容样式4开始
+		HSSFFont font4= wb.createFont();
+		font4.setFontName("仿宋_GB2312");
+		font4.setFontHeightInPoints((short) 16);// 字号
+		font4.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style4 = wb.createCellStyle(); // 表格内容样式
+		style4.setAlignment(HSSFCellStyle.ALIGN_LEFT); // 创建一个居左格式
+		style4.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style4.setBorderBottom(HSSFCellStyle.BORDER_NONE);// 下边框
+		style4.setBorderLeft(HSSFCellStyle.BORDER_NONE);// 左边框
+		style4.setBorderRight(HSSFCellStyle.BORDER_NONE);// 右边框
+		style4.setBorderTop(HSSFCellStyle.BORDER_NONE);// 上边框
+		style4.setWrapText(true); // 设置换行
+		style4.setFont(font4);
+		//底部备注样式
+		HSSFFont font3= wb.createFont();
+		font3.setFontName("仿宋_GB2312");
+		font3.setFontHeightInPoints((short) 16);// 字号
+		font3.setColor(HSSFColor.RED.index);
+		//font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style5 = wb.createCellStyle(); // 表格内容样式
+		style5.setAlignment(HSSFCellStyle.ALIGN_LEFT); // 创建一个居左格式
+		style5.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style5.setBorderBottom(HSSFCellStyle.BORDER_NONE);// 下边框
+		style5.setBorderLeft(HSSFCellStyle.BORDER_NONE);// 左边框
+		style5.setBorderRight(HSSFCellStyle.BORDER_NONE);// 右边框
+		style5.setBorderTop(HSSFCellStyle.BORDER_NONE);// 上边框
+		style5.setWrapText(true); // 设置换行
+		style5.setFont(font3);
+		
+		SimpleDateFormat fmt2=new SimpleDateFormat("yyyy-MM");
+		SimpleDateFormat fmt3=new SimpleDateFormat("yyyy年MM月");
+		Date parse = fmt2.parse(date);
+		String format = fmt3.format(parse);
+		// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
+		HSSFRow row = sheet.createRow(0);
+		row.setHeight((short) 800);
+		HSSFCell createCell = row.createCell(0);
+		createCell.setCellValue(format);
+		createCell.setCellStyle(style);
+		 row.createCell(1).setCellStyle(style);
+		 row.createCell(2).setCellStyle(style);
+		 row.createCell(3).setCellStyle(style);
+		 row.createCell(4).setCellStyle(style);
+		 row.createCell(5).setCellStyle(style);
+		 row.createCell(6).setCellStyle(style);
+		
+		HSSFRow row1 = sheet.createRow(1);
+		row1.setHeight((short) 1200);
+		HSSFCell row1CreateCell = row1 .createCell(0);
+		row1CreateCell.setCellValue("第三采油厂油田配注公报");
+		row1CreateCell.setCellStyle(style);
+		
+		 row1.createCell(1).setCellStyle(style);
+		 row1.createCell(2).setCellStyle(style);
+		 row1.createCell(3).setCellStyle(style);
+		 row1.createCell(4).setCellStyle(style);
+		 row1.createCell(5).setCellStyle(style);
+		 row1.createCell(6).setCellStyle(style);
+		 
+		sheet.addMergedRegion(new CellRangeAddress(0,0, 0, 6));
+		
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 6));
+		sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 6));
+		sheet.addMergedRegion(new CellRangeAddress(15, 15, 1, 6));
+		
+		for (int i = 0; i < allDzspzreportsummary.size(); i++) {
+			HSSFRow row2 = sheet.createRow(i+2);
+			row2.setHeight((short) 900);
+			HSSFCell row2CreateCell = row2 .createCell(0);
+			HSSFCell row2CreateCell1 = row2 .createCell(1);
+			row2CreateCell.setCellValue(allDzspzreportsummary.get(i).getSerialNumber());
+			row2CreateCell1.setCellValue(allDzspzreportsummary.get(i).getNote());
+			row2CreateCell.setCellStyle(style3);
+			row2CreateCell1.setCellStyle(style3);
+		}
+				
+		HSSFRow row10 = sheet.createRow(10);
+		HSSFRow row11 = sheet.createRow(11);
+		HSSFRow row12 = sheet.createRow(12);
+		HSSFRow row13 = sheet.createRow(13);
+		HSSFRow row14 = sheet.createRow(14);
+		HSSFRow row15 = sheet.createRow(15);
+		HSSFRow row16 = sheet.createRow(16);
+		HSSFRow row17 = sheet.createRow(17);
+		HSSFRow row18 = sheet.createRow(18);
+		
+		
+		row10.setHeight((short)900);
+		row11.setHeight((short)900);
+		row12.setHeight((short)900);
+		row13.setHeight((short)900);
+		row14.setHeight((short)900);
+		row15.setHeight((short)900);
+		row16.setHeight((short)900);
+		row17.setHeight((short)900);
+		row18.setHeight((short)900);
+		
+		
+		HSSFCell row10CreateCell1 = row10.createCell(1);
+		HSSFCell row15CreateCell1 = row15.createCell(1);
+		HSSFCell row16CreateCell1 = row16.createCell(1);
+		HSSFCell row16CreateCell2 = row16.createCell(2);
+		HSSFCell row15CreateCell5 = row15.createCell(5);
+		HSSFCell row16CreateCell5 = row16.createCell(5);
+		HSSFCell row16CreateCell6 = row16.createCell(6);
+		HSSFCell row17CreateCell6 = row17.createCell(6);
+		HSSFCell row18CreateCell6 = row18.createCell(6);
+		
+		HSSFCell row11CreateCell1 = row11.createCell(1);
+		HSSFCell row12CreateCell1 = row12.createCell(1);
+		HSSFCell row13CreateCell1 = row13.createCell(1);
+		HSSFCell row11CreateCell2 = row11.createCell(2);
+		HSSFCell row12CreateCell2 = row12.createCell(2);
+		HSSFCell row13CreateCell2 = row13.createCell(2);
+		HSSFCell row11CreateCell3 = row11.createCell(3);
+		HSSFCell row12CreateCell3 = row12.createCell(3);
+		HSSFCell row13CreateCell3 = row13.createCell(3);
+		HSSFCell row11CreateCell4 = row11.createCell(4);
+		HSSFCell row12CreateCell4 = row12.createCell(4);
+		HSSFCell row13CreateCell4 = row13.createCell(4);
+		HSSFCell row11CreateCell5 = row11.createCell(5);
+		HSSFCell row12CreateCell5 = row12.createCell(5);
+		HSSFCell row13CreateCell5 = row13.createCell(5);
+		HSSFCell row11CreateCell6 =row11.createCell(6);
+		HSSFCell row12CreateCell6 =row12.createCell(6);
+		HSSFCell row13CreateCell6 =row13.createCell(6);
+		HSSFCell row11CreateCell7 =row11.createCell(7);
+		HSSFCell row12CreateCell7 =row12.createCell(7);
+		HSSFCell row13CreateCell7 =row13.createCell(7);
+		//总配注计算
+		row11CreateCell1.setCellValue("自营:");
+		row12CreateCell1.setCellValue("自营:");
+		row13CreateCell1.setCellValue("合作开发:");
+		row11CreateCell2.setCellValue("地质配注:");
+		row12CreateCell2.setCellValue("考核配注:");
+		row13CreateCell2.setCellValue("地质配注:");
+		row11CreateCell3.setCellValue(zydzpz);
+		row12CreateCell3.setCellValue(zykhpz);
+		row13CreateCell3.setCellValue(hzkfdzpz);
+		row11CreateCell4.setCellValue("其中灰岩:");
+		row12CreateCell4.setCellValue("其中灰岩:");
+		row13CreateCell4.setCellValue("考核配注:");
+		row11CreateCell5.setCellValue(zyhySum);
+		row12CreateCell5.setCellValue(khhySum);
+		row13CreateCell5.setCellValue(hzkfkhpz);
+		row11CreateCell6.setCellValue("砂岩:"+zysySum);
+		row12CreateCell6.setCellValue("砂岩:"+khsySum);
+//		row13CreateCell6.setCellValue("砂岩:");
+//		row13CreateCell7.setCellValue("");
+		
+		row11CreateCell1.setCellStyle(style4);
+		row12CreateCell1.setCellStyle(style4);
+		row13CreateCell1.setCellStyle(style4);
+		row11CreateCell2.setCellStyle(style4);
+		row12CreateCell2.setCellStyle(style4);
+		row13CreateCell2.setCellStyle(style4);
+		row11CreateCell3.setCellStyle(style4);
+		row12CreateCell3.setCellStyle(style4);
+		row13CreateCell3.setCellStyle(style4);
+		row11CreateCell4.setCellStyle(style4);
+		row12CreateCell4.setCellStyle(style4);
+		row13CreateCell4.setCellStyle(style4);
+		row11CreateCell5.setCellStyle(style4);
+		row12CreateCell5.setCellStyle(style4);
+		row13CreateCell5.setCellStyle(style4);
+		row11CreateCell6.setCellStyle(style4);
+		row12CreateCell6.setCellStyle(style4);
+		row13CreateCell6.setCellStyle(style4);
+
+		
+		//按月份查询备注
+		List<DzsPzReportSummarkRemark> summarkRemark = dzsPzReportSummarkRemarkService.getSummarkRemark(date);
+		String summarkRemarkId=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkRemarkId():"";
+		String remark=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkRemark():"备注...";
+		String verifier=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkVerifier():"";
+		String approver=summarkRemark.size()!=0?summarkRemark.get(0).getSummarkApprover():"";
+		row15CreateCell1.setCellValue(remark);
+		row16CreateCell2.setCellValue(verifier);
+		row16CreateCell6.setCellValue(approver);
+		
+		row15CreateCell1.setCellStyle(style5);
+		row16CreateCell2.setCellStyle(style3);
+		row16CreateCell6.setCellStyle(style3);
+		SimpleDateFormat fmt=new SimpleDateFormat("yyyy年MM月dd日");
+		String date2 = fmt.format(new Date());
+		//底部内容
+				row16CreateCell1.setCellValue("审核: ");
+				row16CreateCell5.setCellValue("审批: ");
+				row17CreateCell6.setCellValue(" 第三采油厂地质研究所 ");
+				row18CreateCell6.setCellValue(date2);
+				
+				row16CreateCell1.setCellStyle(style3);
+				row16CreateCell5.setCellStyle(style3);
+				row17CreateCell6.setCellStyle(style3);
+				row18CreateCell6.setCellStyle(style3);
+		
+
+		OutputStream output = response.getOutputStream();
+		response.reset();
+		response.setHeader("Content-disposition","attachment; filename=monthPZbb.xls");
+		response.setContentType("application/msexcel");
+		wb.write(output);
+		output.flush();
+		output.close();
+		
+		return null;
+	}
+
+/**
+ * 创建sheet方法
+ * @param wb
+ */
+	public void createSheet(HSSFWorkbook wb,String sheetName,String titleName,List<MonthPZ> monthPZList,List<YpzTJ> ypzTJList) {
+		//表头样式 1 开始
+		HSSFFont titleFont = wb.createFont();
+		titleFont.setFontName("Times New Roman");
+		titleFont.setFontHeightInPoints((short) 26);// 字号
+		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		// 第四步，创建单元格，并设置值表头 设置表头居中  
+		HSSFCellStyle style = wb.createCellStyle(); // 表格内容样式
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style.setBorderBottom(HSSFCellStyle.BORDER_NONE);// 下边框
+		style.setBorderLeft(HSSFCellStyle.BORDER_NONE);// 左边框
+		style.setBorderRight(HSSFCellStyle.BORDER_NONE);// 右边框
+		style.setBorderTop(HSSFCellStyle.BORDER_NONE);// 上边框
+	style.setWrapText(true); // 设置换行
+		style.setFont(titleFont);
+		
+		//表头样式2 开始
+		HSSFFont titleFont2 = wb.createFont();
+		titleFont2.setFontName("楷体_GB2312");
+		titleFont2.setFontHeightInPoints((short) 16);// 字号
+		titleFont2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style2 = wb.createCellStyle(); // 表格内容样式
+		style2.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style2.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style2.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style2.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style2.setWrapText(true); // 设置换行
+		style2.setFont(titleFont2);
+		
+		//内容样式开始
+		HSSFFont font = wb.createFont();
+		font.setFontName("楷体_GB2312");
+		font.setFontHeightInPoints((short) 16);// 字号
+		//titleFont2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style3 = wb.createCellStyle(); // 表格内容样式
+		style3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style3.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style3.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style3.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style3.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style3.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style3.setWrapText(true); // 设置换行
+		style3.setFont(font);
+		//内容样式2开始
+		HSSFFont font2 = wb.createFont();
+		font2.setFontName("楷体_GB2312");
+		font2.setFontHeightInPoints((short) 16);// 字号
+		font2.setColor(HSSFColor.RED.index);
+		
+		//titleFont2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		
+		HSSFCellStyle style4 = wb.createCellStyle(); // 表格内容样式
+		style4.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style4.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		style4.setBorderBottom(HSSFCellStyle.BORDER_THIN);// 下边框
+		style4.setBorderLeft(HSSFCellStyle.BORDER_THIN);// 左边框
+		style4.setBorderRight(HSSFCellStyle.BORDER_THIN);// 右边框
+		style4.setBorderTop(HSSFCellStyle.BORDER_THIN);// 上边框
+		style4.setWrapText(true); // 设置换行
+		style4.setFont(font2);
+		
+		//底部样式开始
+		HSSFFont fontDB = wb.createFont();
+		fontDB.setFontName("楷体_GB2312");
+		fontDB.setFontHeightInPoints((short) 16);// 字号
+		fontDB.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 加粗
+		fontDB.setColor(HSSFColor.BLACK.index);
+		
+		HSSFCellStyle styleDB = wb.createCellStyle(); // 表格内容样式
+		styleDB.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		styleDB.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
+		styleDB.setWrapText(true); // 设置换行
+		styleDB.setFont(fontDB);
+		
+		HSSFSheet sheet2 = wb.createSheet(sheetName);
+		String[] sheet2Title2 = { "油藏","井号","地质配注","考核配注","上月考核配注","备注"};
+			
+		sheet2.setColumnWidth((short) 0, 3500);
+		sheet2.setColumnWidth((short) 1, 3500);
+		sheet2.setColumnWidth((short) 2, 3500);
+		sheet2.setColumnWidth((short) 3, 3500);
+		sheet2.setColumnWidth((short) 4, 3500);
+		sheet2.setColumnWidth((short) 5, 6500);
+		
+		HSSFRow sheet2Row0 = sheet2.createRow(0);
+		HSSFRow sheet2Row1 = sheet2.createRow(1);
+		sheet2Row0.setHeight((short)900);
+		sheet2Row1.setHeight((short)500);
+		HSSFCell sheet2Row0createCell0 = sheet2Row0.createCell(0);
+		sheet2Row0createCell0.setCellStyle(style);
+		sheet2Row0createCell0.setCellValue(titleName+"配注公报");
+		sheet2.addMergedRegion(new CellRangeAddress(0,0, 0, 5));
+		
+HSSFCell cell = null;
+		// 创建标题
+	for (int i = 0; i < sheet2Title2.length; i++) {
+			cell = sheet2Row1.createCell(i);
+			cell.setCellValue(sheet2Title2[i]);
+			cell.setCellStyle(style2);
+		}
+	
+	String project = "";
+	int stratRowNum = 2;
+	int endNum=0;;
+	
+	for(int i=0;i<monthPZList.size();i++){
+		if("2".equals(monthPZList.get(i).getOrderSort())){
+			monthPZList.get(i).setWell_name(monthPZList.get(i).getWell_name()+"口井");
+		}
+		
+		//动态合并内容相同的行
+		if(i==0){
+			project = monthPZList.get(i).getYc_name();
+		}
+		if(!project.equals(monthPZList.get(i).getYc_name())){
+			if(stratRowNum<endNum){
+				sheet2.addMergedRegion(new CellRangeAddress(stratRowNum,endNum,0, 0));
+			}
+			project = monthPZList.get(i).getYc_name();
+			stratRowNum=i+2;
+		}else if(project.equals(monthPZList.get(i).getYc_name())){
+			endNum=i+2;
+			if(project.equals(monthPZList.get(i).getYc_name())&&i==monthPZList.size()-1){
+				sheet2.addMergedRegion(new CellRangeAddress(stratRowNum,endNum,0, 0));
+			}
+		}
+		
+		HSSFRow createRow = sheet2.createRow(i+2);
+		createRow.setHeight((short)500);
+		HSSFCell createCell0 = createRow.createCell(0);
+		HSSFCell createCell1 = createRow.createCell(1);
+		HSSFCell createCell2 = createRow.createCell(2);
+		HSSFCell createCell3 = createRow.createCell(3);
+		HSSFCell createCell4 = createRow.createCell(4);
+		HSSFCell createCell5 = createRow.createCell(5);
+		
+		createCell0.setCellValue(monthPZList.get(i).getYc_name());
+		createCell1.setCellValue(monthPZList.get(i).getWell_name());
+		createCell2.setCellValue(monthPZList.get(i).getDzpz());
+		createCell3.setCellValue(monthPZList.get(i).getKhpz()!=null?monthPZList.get(i).getKhpz():0);
+		createCell4.setCellValue(monthPZList.get(i).getUpMonthPZ());
+		createCell5.setCellValue(monthPZList.get(i).getMark());
+		
+		createCell0.setCellStyle(style3);
+		if("2".equals(monthPZList.get(i).getOrderSort())){
+			createCell1.setCellStyle(style4);
+			createCell2.setCellStyle(style4);
+		}else{
+			createCell1.setCellStyle(style3);
+			createCell2.setCellStyle(style3);
+		}
+		createCell3.setCellStyle(style3);
+		createCell4.setCellStyle(style3);
+		createCell5.setCellStyle(style3);
+		
+		}
+	//底部合计内容
+	HSSFRow createRow = sheet2.createRow(monthPZList.size()+3);
+	createRow.setHeight((short)500);
+	HSSFCell createCell1 = createRow.createCell(1);
+	HSSFCell createCell = createRow.createCell(2);
+	HSSFCell createCell3 = createRow.createCell(3);
+	HSSFCell createCell4 = createRow.createCell(4);
+	createCell1.setCellValue(sheetName+"工区");
+	createCell.setCellValue("地质配注");
+	createCell3.setCellValue("考核配注");
+	createCell4.setCellValue("上月考核");
+	createCell1.setCellStyle(style2);
+	createCell.setCellStyle(style2);
+	createCell3.setCellStyle(style2);
+	createCell4.setCellStyle(style2);
+	
+	for(int i=0;i<ypzTJList.size();i++){
+		HSSFRow createRow2 = sheet2.createRow(monthPZList.size()+4+i);
+		createRow2.setHeight((short)400);
+		HSSFCell createCell1row2 = createRow2.createCell(1);
+		HSSFCell createCell2row2 = createRow2.createCell(2);
+		HSSFCell createCell3row2 = createRow2.createCell(3);
+		HSSFCell createCell4row2= createRow2.createCell(4);
+		createCell1row2.setCellValue(ypzTJList.get(i).getType().equals("0")?"灰岩":ypzTJList.get(i).getType().equals("1")?"沙岩":ypzTJList.get(i).getType().equals("2")?"合计":"");
+		createCell2row2.setCellValue(ypzTJList.get(i).getDzpz());
+		createCell3row2.setCellValue(ypzTJList.get(i).getKhpz());
+		createCell4row2.setCellValue(ypzTJList.get(i).getUpKhpz());
+		createCell1row2.setCellStyle(style2);
+		createCell2row2.setCellStyle(style2);
+		createCell3row2.setCellStyle(style2);
+		createCell4row2.setCellStyle(style2);
+		}
+	HSSFRow createRow2 = sheet2.createRow(monthPZList.size()+5+ypzTJList.size());
+	createRow2.setHeight((short)500);
+	HSSFCell createCell3D = createRow2.createCell(3);
+	HSSFCell createCell4D = createRow2.createCell(4);
+	HSSFCell createCell5D = createRow2.createCell(5);
+	createCell3D.setCellValue("制表人:");
+	createCell4D.setCellValue("");
+	SimpleDateFormat fmt=new SimpleDateFormat("yyyy年MM月dd日");
+	String date2 = fmt.format(new Date());
+	createCell5D.setCellValue(date2);
+	createCell3D.setCellStyle(styleDB);
+	createCell4D.setCellStyle(styleDB);
+	createCell5D.setCellStyle(styleDB);
+	
+	}
+	
+}

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.CsjhMapper">
+
+	<!-- csjh  -->
+	<resultMap id="csjh_Mp" type="com.hrxt.pojo.Csjh">
+		<result property="seq" 			jdbcType="VARCHAR" column="seq"/>
+		<result property="site_id" 		jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="site_name"/>
+		<result property="yc_id" 		jdbcType="VARCHAR" column="yc_id"/>
+		<result property="yc_name" 		jdbcType="VARCHAR" column="yc_name"/>
+		<result property="well_id" 		jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 	jdbcType="VARCHAR" column="well_name"/>
+		<result property="well_type" 	jdbcType="INTEGER" column="well_type"/>
+		<result property="well_type_name" 	jdbcType="VARCHAR" column="well_type_name"/>
+		<result property="well_status" 	jdbcType="VARCHAR" column="well_status"/>
+		<result property="well_step_id" jdbcType="VARCHAR" column="well_step_id"/>
+		<result property="well_step_name" 	jdbcType="VARCHAR" column="well_step_name"/>
+		<result property="prod_daily" 	jdbcType="DOUBLE" column="prod_daily"/>
+		<result property="mark" 		jdbcType="VARCHAR" column="mark"/>
+		<result property="create_date" 	jdbcType="DATE" 	column="create_date"/>
+		<result property="stime" 		jdbcType="VARCHAR" column="stime"/>
+		<result property="update_date" 	jdbcType="DATE" 	column="update_date"/>
+		<result property="tj_status" 	jdbcType="VARCHAR" column="tj_status"/>
+		<result property="sh_status" 	jdbcType="VARCHAR" column="sh_status"/>
+		<result property="step_type" 	jdbcType="VARCHAR" column="step_type"/>
+	</resultMap>
+	
+	<!-- 测试计划下拉框bean  -->
+	<resultMap id="csjh_Option_Mp" type="com.hrxt.pojo.CsjhOption">
+		<result property="cs_id" 		jdbcType="VARCHAR" column="cs_id"/>
+		<result property="cs_name" 		jdbcType="VARCHAR" column="cs_name"/>
+		<result property="cs_type" 		jdbcType="VARCHAR" column="cs_type"/>
+		<result property="cs_flag" 		jdbcType="VARCHAR" column="cs_flag"/>
+		<result property="sort_order" 	jdbcType="VARCHAR" column="sort_order"/>
+		<result property="start_using" 	jdbcType="VARCHAR" column="start_using"/>
+	</resultMap>
+	
+
+	<!-- 查询 csjh计划 —-->
+	<select id="p_get_csjh" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_GET_CSJH(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_step_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_type, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_status, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_step_type, 	 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_tj_status, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_status, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_p_index,		mode=IN, jdbcType=INTEGER},
+		  			#{i_p_size, 		mode=IN, jdbcType=INTEGER},
+		  			#{v_totalrecords, 	mode=OUT, jdbcType=INTEGER},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=csjh_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	
+	<select id="p_dzs_del_csjh"  statementType="CALLABLE" parameterType="java.util.Map" >
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_DEL_CSJH(
+				#{i_seq,mode=IN,jdbcType=VARCHAR},
+				#{o_mesg,mode=OUT,jdbcType=VARCHAR}
+			) 
+		 ]]>
+	</select>
+	
+	
+	<select id="p_dzs_insert_up_csjh" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_INSERT_UP_CSJH(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_type_name, mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_status, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_step_name, mode=IN, jdbcType=VARCHAR},
+		  			#{i_prod_daily, mode=IN, jdbcType=DOUBLE},
+		  			#{i_mark,		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime,		mode=IN, jdbcType=VARCHAR},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+   	<!-- 修改为审核状态 -->
+  	<update id="auditOneOilJCJH" parameterType="String">
+		update DZS_CSJH set SH_STATUS=1  where seq in(${value})
+	</update>
+	<update id="unAuditOneOilJCJH" parameterType="String">
+		update DZS_CSJH set SH_STATUS=0  where seq in(${value})
+	</update>
+	
+	<!-- 修改为  提交状态 -->
+	<update id="submitOilJCJH" parameterType="String">
+		update DZS_CSJH set TJ_STATUS=1  where seq in(${value})
+	</update>
+	
+	<update id="unSubmitOilJCJH" parameterType="String">
+		update DZS_CSJH set TJ_STATUS=0  where seq in(${value})
+	</update>		
+	
+	<!-- option 下拉框  function  -->
+	
+	<select id="p_zds_well_cs_get" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_zds_well_cs_get(
+		  			#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=jCJHOption_Oil_Map}
+			)
+		 ]]>
+	</select>
+	
+	
+	<select id="p_zds_well_cs_in_up" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_zds_well_cs_in_up(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_type, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_flag, 	mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+		
+	
+	<select id="p_dzs_well_cs_del" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_well_cs_del(
+					#{i_sql, 	mode=IN, jdbcType=VARCHAR},
+		  			#{v_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	
+</mapper>

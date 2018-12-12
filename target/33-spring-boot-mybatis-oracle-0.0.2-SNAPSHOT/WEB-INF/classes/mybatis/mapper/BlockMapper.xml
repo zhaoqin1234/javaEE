@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.BlockMapper">
+
+	<!-- 断块entry 字段映射  -->
+	<resultMap id="block_Mp" type="com.hrxt.pojo.Block">
+		<result property="id" 		jdbcType="VARCHAR" column="SITE_ID"/>
+		<result property="name" 	jdbcType="VARCHAR" column="SITE_NAME"/>
+	</resultMap>
+	<!-- 获得某个工区下面的 断块信息  —-->
+	<select id="p_DZS_GET_SUB_DK" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_ZDWH.P_DZS_GET_SUB_DK(
+		  			#{i_org_id, mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=block_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	
+</mapper>

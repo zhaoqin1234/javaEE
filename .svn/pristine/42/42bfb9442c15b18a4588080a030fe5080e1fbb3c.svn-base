@@ -1,0 +1,30 @@
+package com.hrxt.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.Xjscyxk;
+
+public interface XjscyxkService {
+	
+	
+	
+public Map<String,Object> getXjscyxkList(Xjscyxk monthPZ,Page<List<Xjscyxk>> page);
+	
+	
+	
+	public String  insertOrUpdate(Xjscyxk monthPZ);
+	
+
+	public List<String> batchInsertOrUpdate(List<Xjscyxk> monthPZlist);
+	
+	
+
+	public String delOneYPZBB(String sep);
+	
+
+	public String delListYPZBB(String sep);
+
+} 

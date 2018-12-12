@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.MonthPZMapper">
+
+	<!-- 断块entry 字段映射  -->
+	<resultMap id="monthPZ_Mp" type="com.hrxt.pojo.MonthPZ">
+		<result property="site_id" 		jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="site_name"/>
+		<result property="yc_id" 		jdbcType="VARCHAR" column="yc_id"/>
+		<result property="yc_name" 		jdbcType="VARCHAR" column="yc_name"/>
+		<result property="well_id" 		jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 	jdbcType="VARCHAR" column="well_name"/>
+		<result property="dzpz" 		jdbcType="INTEGER" column="dzpz"/>
+		<result property="khpz" 		jdbcType="INTEGER" column="khpz"/>
+		<result property="cz_sj_jh" 	jdbcType="INTEGER" column="cz_sj_jh"/>
+		<result property="cz_sj_sj" 	jdbcType="INTEGER" column="cz_sj_sj"/>
+		<result property="cz_jh_jh" 	jdbcType="INTEGER" column="cz_jh_jh"/>
+		<result property="mark" 		jdbcType="VARCHAR" column="mark"/>
+		<result property="tj_starts" 	jdbcType="VARCHAR" column="tj_starts"/>
+		<result property="sh_starts" 	jdbcType="VARCHAR" column="sh_starts"/>
+		<result property="create_time" 	jdbcType="VARCHAR" column="create_time"/>
+		<result property="stime" 		jdbcType="VARCHAR" column="stime"/>
+		<result property="update_time" 	jdbcType="VARCHAR" column="update_time"/>
+		<result property="sum_dzpz" 	jdbcType="INTEGER" column="sum_dzpz"/>
+		<result property="sum_khpz" 	jdbcType="INTEGER" column="sum_khpz"/>
+		<result property="sum_well_cnt" jdbcType="INTEGER" column="sum_well_cnt"/>
+		<result property="seq" 			jdbcType="INTEGER" column="seq"/>
+		<result property="last_kh" 		jdbcType="VARCHAR" column="last_kh"/>
+		<result property="upMonthPZ" 	jdbcType="VARCHAR" column="upMonthPZ"/>
+		<result property="orderSort" 	jdbcType="VARCHAR" column="order_Sort"/>
+	</resultMap>
+		<resultMap id="YpzTJ" type="YpzTJ">
+		<result property="org_id"	jdbcType="VARCHAR" column="org_id"/>
+		<result property="type"  	jdbcType="VARCHAR" column="type"/>  
+		<result property="dzpz"  	jdbcType="VARCHAR" column="dzpz"/>  
+		<result property="khpz" 	jdbcType="VARCHAR" column="khpz"/> 	
+		<result property="upKhpz"	jdbcType="VARCHAR" column="up_Khpz"/>
+	</resultMap>
+	
+	<resultMap type="com.hrxt.pojo.Dzs_pz_report_summary" id="Dzs_pz_report_summaryMap">
+		<result property="id" jdbcType="VARCHAR" column="ID"/>
+		<result property="note" jdbcType="VARCHAR" column="NOTE"/>
+		<result property="orderPort" jdbcType="VARCHAR" column="ORDER_PORT"/>
+		<result property="stime" jdbcType="VARCHAR" column="STIME"/>
+	</resultMap>
+	
+	
+	<!-- 查询配注 信息   月配注报表 p_dzs_get_ypzbb —-->
+	<select id="P_GET_YPZBB_REPORT" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_GET_YPZBB_REPORT(
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=monthPZ_Mp},
+					#{o_my_cur_count, 	mode=OUT,jdbcType=CURSOR, resultMap=YpzTJ}
+		          )
+	    ]]>
+	</select>
+	
+	
+	<!-- 查询配注 信息   月配注报表 p_dzs_get_ypzbb —-->
+	<select id="p_dzs_get_ypzbb" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_get_ypzbb(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_p_index,	mode=IN, jdbcType=INTEGER},
+		  			#{i_p_size, 	mode=IN, jdbcType=INTEGER},
+		  			#{v_totalrecords, 	mode=OUT, jdbcType=INTEGER},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=monthPZ_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	
+	<select id="p_DZS_DEL_YPZBB"  statementType="CALLABLE" parameterType="java.util.Map" >
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_DEL_YPZBB(
+				#{i_seq,mode=IN,jdbcType=VARCHAR},
+				#{o_mesg,mode=OUT,jdbcType=VARCHAR}
+			) 
+		 ]]>
+	</select>
+	
+	
+	<select id="p_DZS_INSERT_UP_YPZBB" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_INSERT_UP_YPZBB(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_dzpz, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_khpz, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_mark,		mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{I_STIME, 		mode=IN, jdbcType=INTEGER},
+		  			#{o_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	<select id="p_DZS_INSERT_UP_YPZBB_EXCEL" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_INSERT_UP_YPZBB_EXCEL(
+		  			#{i_site_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_dzpz, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_khpz, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_mark,		mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{I_STIME, 		mode=IN, jdbcType=INTEGER},
+		  			#{o_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	<select id="p_dzs_get_ypzbb_mb" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_GET_YPZBB_MB(
+					#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=monthPZ_Mp}
+			)
+		 ]]>
+	</select>
+	
+			
+	<!-- 修改为审核状态 -->
+  	<update id="auditOneYPZBB" parameterType="String">
+		update DZS_PZ_MONTH set SH_STARTS=1  where seq in(${value})
+	</update>
+	<update id="unAuditOneYPZBB" parameterType="String">
+		update DZS_PZ_MONTH set SH_STARTS=0  where seq in(${value})
+	</update>
+	
+	<!-- 修改为  提交状态 -->
+	<update id="submitMonthPZ" parameterType="String">
+		update DZS_PZ_MONTH set TJ_STARTS=1  where seq in(${value})
+	</update>
+	
+	<update id="unSubmitMonthPZ" parameterType="String">
+		update DZS_PZ_MONTH set TJ_STARTS=0  where seq in(${value})
+	</update>
+	
+	<select id="selectAllDZS_PZ_REPORT_SUMMARY"  resultMap="Dzs_pz_report_summaryMap">
+		select ID,NOTE,STIME form DZS_PZ_REPORT_SUMMARY order by ORDER_PORT asc
+	</select>
+	
+</mapper>

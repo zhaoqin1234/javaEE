@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.OilJCJHMapper">
+
+	<!-- 油井监测计划   -->
+	<resultMap id="oilJCJH_Mp" type="com.hrxt.pojo.OilJCJH">
+		<!--    字段不全临时替换
+		<result property="seq" 			jdbcType="VARCHAR" column="seq"/>
+		<result property="site_id" 		jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="site_name"/>
+		<result property="yc_id" 		jdbcType="VARCHAR" column="yc_id"/>
+		<result property="yc_name" 		jdbcType="VARCHAR" column="yc_name"/>
+		<result property="well_id" 		jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 	jdbcType="VARCHAR" column="well_name"/>
+		<result property="well_type" 	jdbcType="INTEGER" column="well_type"/>
+		<result property="well_type_name" 	jdbcType="VARCHAR" column="well_type_name"/>
+		<result property="well_status" 	jdbcType="VARCHAR" column="well_status"/>
+		<result property="well_step_id" jdbcType="VARCHAR" column="well_step_id"/>
+		<result property="well_step_name" 	jdbcType="VARCHAR" column="well_step_name"/>
+		<result property="prod_daily" 	jdbcType="DOUBLE" column="prod_daily"/>
+		<result property="mark" 		jdbcType="VARCHAR" column="mark"/>
+		<result property="create_date" 	jdbcType="VARCHAR" 	column="create_date"/>
+		<result property="stime" 		jdbcType="VARCHAR" column="stime"/>
+		<result property="update_date" 	jdbcType="VARCHAR" 	column="update_date"/>
+		<result property="tj_status" 	jdbcType="VARCHAR" column="tj_status"/>
+		<result property="sh_status" 	jdbcType="VARCHAR" column="sh_status"/>
+		<result property="step_type" 	jdbcType="INTEGER" column="step_type"/>
+		-->
+		
+		<result property="seq" 					jdbcType="VARCHAR" column="seq"/>
+		<result property="site_id" 				jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 			jdbcType="VARCHAR" column="site_name"/>
+		<result property="yc_id" 				jdbcType="VARCHAR" column="yc_id"/>
+		<result property="yc_name" 				jdbcType="VARCHAR" column="yc_name"/>
+		<result property="well_id" 				jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 			jdbcType="VARCHAR" column="well_name"/>
+		<result property="cs_type_id" 			jdbcType="VARCHAR" column="cs_type_id"/>
+		<result property="cs_type_name" 		jdbcType="VARCHAR" column="cs_type_name"/>
+		<result property="well_section" 		jdbcType="VARCHAR" column="well_section"/>
+		<result property="thickness" 			jdbcType="DOUBLE" column="thickness"/>
+		<result property="cs_purpose" 			jdbcType="VARCHAR" column="cs_purpose"/>
+		<result property="cs_explaim" 			jdbcType="VARCHAR" column="cs_explaim"/>
+		<result property="cs_claim" 			jdbcType="VARCHAR" column="cs_claim"/>
+		<result property="last_success_date" 	jdbcType="VARCHAR" column="last_success_date"/>
+		<result property="recently_fail_date" 	jdbcType="VARCHAR" column="recently_fail_date"/>
+		<result property="recently_revise_mesg" jdbcType="VARCHAR" column="recently_revise_mesg"/>
+		<result property="level_demand" 		jdbcType="VARCHAR" column="level_demand"/>
+		<result property="tc_date" 				jdbcType="VARCHAR" column="tc_date"/>
+		<result property="fk_cd_date" 			jdbcType="VARCHAR" column="fk_cd_date"/>
+		<result property="wcd_mesg" 			jdbcType="VARCHAR" column="wcd_mesg"/>
+		<result property="success_date" 		jdbcType="VARCHAR" column="success_date"/>
+		<result property="fail_mesg" 			jdbcType="VARCHAR" column="fail_mesg"/>
+		<result property="create_date" 			jdbcType="VARCHAR" column="create_date"/>
+		<result property="update_date" 			jdbcType="VARCHAR" column="update_date"/>
+		<result property="tj_status" 			jdbcType="VARCHAR" column="tj_status"/>
+		<result property="sh_status" 			jdbcType="VARCHAR" column="sh_status"/>
+		<result property="stime" 				jdbcType="VARCHAR" column="stime"/>
+		<result property="plies_num" 			 column="plies_num"/>
+		<result property="xm" 					jdbcType="VARCHAR" column="xm"/>
+		<result property="flag" 				jdbcType="VARCHAR" column="flag"/>
+		<result property="xh" 					jdbcType="VARCHAR" column="xh"/>
+		<result property="sum_px" 				jdbcType="VARCHAR" column="sum_px"/>
+		<result property="sum_co" 				jdbcType="VARCHAR" column="sum_co"/>
+		<result property="sjyy" 				jdbcType="VARCHAR" column="sjyy"/>
+	</resultMap>
+	
+
+
+	<!-- 查询 oil检测计划查询 —-->
+	<select id="p_get_oil_jcjh" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_get_oil_jcjh(
+					#{i_seq, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_type_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_tj_status, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_status, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_startdate, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_enddate, 			mode=IN, jdbcType=VARCHAR},
+		  			#{datetype, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_p_index, 	 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_p_size, 		mode=IN, jdbcType=VARCHAR},
+		  			#{v_totalrecords, 	mode=OUT, jdbcType=INTEGER},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=oilJCJH_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	<!-- 检测计划模板导出使用 -->
+	 <select id="p_dzs_oil_jcjh_mb" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_oil_jcjh_mb(
+		  			#{i_site_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 		mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=oilJCJH_Mp}
+		          )
+	    ]]>
+	</select>					
+                          
+                        
+	<!--    -->
+	<select id="p_dzs_del_oil_jcjh"  statementType="CALLABLE" parameterType="java.util.Map" >
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_DEL_OIL_JCJH(
+				#{i_seq,mode=IN,jdbcType=VARCHAR},
+				#{o_mesg,mode=OUT,jdbcType=VARCHAR}
+			) 
+		 ]]>
+	</select>
+
+
+	<!-- 页面的  insert  and update  -->
+	<select id="p_jcjh_insert_or_update" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_OIL_JCJH_INSERT_UP(
+					#{i_seq, 			mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_type_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_section, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_thickness, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_purpose, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_explaim, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_claim, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_last_success_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_recently_fail_date, mode=IN, jdbcType=VARCHAR},
+		  			#{i_recently_revise_mesg, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_level_demand, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_tc_date, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_fk_cd_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_wcd_mesg, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_success_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_fail_mesg, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 			mode=IN, jdbcType=DOUBLE},
+		  			#{i_plies_num,		mode=IN, jdbcType=VARCHAR},
+		  			#{o_mesg, 			mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+
+	<!-- excel insert -->
+	<select id="p_oil_jcjh_insert_up_excel" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_oil_jcjh_insert_up_excel(
+		  			#{i_site_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_type_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_section, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_thickness, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_purpose, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_explaim, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_cs_claim, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_last_success_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_recently_fail_date, mode=IN, jdbcType=VARCHAR},
+		  			#{i_recently_revise_mesg, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_level_demand, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_tc_date, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_fk_cd_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_wcd_mesg, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_success_date, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_fail_mesg, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 			mode=IN, jdbcType=DOUBLE},
+		  			#{i_plies_num,		mode=IN, jdbcType=VARCHAR},
+		  			#{o_mesg, 			mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	   								  
+	   								  
+     <!-- 检测计划  报表导出 -->
+	 <select id="p_get_jcjh_report" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_get_jcjh_report(
+		  			#{i_date, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=oilJCJH_Mp}
+		          )
+	    ]]>
+	</select>	
+	                         
+                              
+	<!-- 修改为审核状态 -->
+  	<update id="auditOneOilJCJH" parameterType="String">
+		update DZS_OIL_JCJH set SH_STATUS=1  where seq in(${value})
+	</update>
+	<update id="unAuditOneOilJCJH" parameterType="String">
+		update DZS_OIL_JCJH set SH_STATUS=0  where seq in(${value})
+	</update>
+	
+	<!-- 修改为  提交状态 -->
+	<update id="submitOilJCJH" parameterType="String">
+		update DZS_OIL_JCJH set TJ_STATUS=1  where seq in(${value})
+	</update>
+	
+	<update id="unSubmitOilJCJH" parameterType="String">
+		update DZS_OIL_JCJH set TJ_STATUS=0  where seq in(${value})
+	</update>
+	
+	
+</mapper>

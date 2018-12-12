@@ -1,0 +1,207 @@
+
+<!doctype html>
+
+
+<!--  DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"-->
+
+<!--  html xmlns="http://www.w3.org/1999/xhtml"-->
+<html>
+<head runat="server">
+    <title></title>
+<link href="/DZSBB/App_Themes/LoginStyles.css" rel="stylesheet" type="text/css" />
+    <style type="text/css"> #g_div{text-align:right;overflow:hidden}
+ .b{width:24px; height:16px; background:#737373; font-size:14px; font-weight:bold; color:#fff; text-decoration:none;margin-left:1px}
+ .b:hover{width:24px; height:16px; background:#780001; font-size:14px; font-weight:bold; color:#fff; text-decoration:none;margin-left:1px}
+ .bhover{width:24px; height:16px; background:#780001; font-size:14px; font-weight:bold; color:#fff; text-decoration:none;margin-left:1px}
+  </style>
+  <script type="text/javascript" src="/DZSBB/resources/js/jquery-1.7.2.js"></script>
+  <script language="javascript" type="text/javascript">
+
+      function channel() {
+          //          window.opener = null;
+
+          //window.location.href = "main.html";
+
+          //window.open("main.html", "", "fullscreen,scrollbars")
+          var name = $("#name_id").val();
+          var password = $("#password_id").val();
+          $.ajax({
+	            url: "/DZSBB/user/getUserByUser",
+	            dataType:'json',
+	            async: false,
+	            data: {
+	           	 name:name,passWord:password
+	            },
+	            success: function (text) {
+	          		console.log(text);
+	          		//window.open("/DZSBB/index2?id="+text[0].id, "", "fullscreen,scrollbars")
+	          		window.location.href = "/DZSBB/index2?id="+text[0].id;
+	            }
+	        });
+          
+          window.opener = null;
+      }
+
+    
+    </script>
+</head>
+<body onload="f()">
+ 	<!-- /DZSBB/images/btn.png -->
+   <center class="center" style=" margin-top:10%;">
+      <img alt="" src="" 
+           style=" position: absolute; top: 41px; left: 194px;" />
+
+           
+<table width="1005" border="0" align="center" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td height="130" valign="bottom" background="/DZSBB/images/bg2.jpg">
+    </td>
+  </tr>
+  <tr>
+    <td height="283" valign="top" background="/DZSBB/images/login/homelogin_bg.jpg">
+	<table width="859" border="0" cellpadding="0" cellspacing="0" >
+      <tr>
+        <td width="349" valign="top" style="padding-left:80px;">
+		 <div style="font-size:16px; font-weight:bold;margin-top:45px;margin-left:15px; text-align:center;">用户登陆</div>
+		<form method="post" action="DZSBB/user/getUserByUser" name='theForm' onsubmit="return validate()">
+		  <table width="247" border="0" cellspacing="0" cellpadding="0" style="margin-left:45px;margin-top:30px;">
+          <tr>
+            <td width="46" height="31">用户名</td>
+            <td width="201">
+              <input type="text" name="username" id="name_id" onmouseover="this.className='loginForm1'"  onmouseout="this.className='loginForm'"  class="loginForm" / value="admin">
+            </td>
+          </tr>
+          <tr>
+            <td height="31">密  &nbsp;码</td>
+            <td><input type="password" name="password" id="password_id" onmouseover="this.className='loginForm1'"  onmouseout="this.className='loginForm'"  class="loginForm" / value="123144"></td>
+          </tr>
+          <tr>
+            <td height="25">&nbsp;</td>
+            <td style="padding-left:3px;" class="yellow">密码忘了？<a href="get_password.php?action=forget_pwd">这里找回</a></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td class="Go">
+			<input type="hidden" name="action" value="signin" />
+			<input type="button" name="imageField"  onclick="channel()"   class="loginBt"/>
+			</td>
+          </tr>
+        </table>
+		 </form>
+		</td>
+       <td width="458" valign="top" style="padding-left:80px;">
+       
+		<P><FONT face="宋体"></FONT>&nbsp;</P>
+  <FONT face="宋体"></FONT>
+  <div id="g_div" style="WIDTH:456px;HEIGHT:262px">
+  <a href="#" target="_blank">
+  <img id="g_img" style="BORDER-RIGHT:green 1px solid; BORDER-TOP:green 1px solid; FILTER:revealTrans(duration=1,transition=23); BORDER-LEFT:green 1px solid; WIDTH:456px; BORDER-BOTTOM:green 1px solid; HEIGHT:240px" src="images/13346307_222455836000_2.jpg"> 
+  </a><a href="#" for="/DZSBB/images/13346307_222455836000_2.jpg" target="_blank">
+  </a><a href="#" for="/DZSBB/images/ln1.jpg" target="_blank"></a>
+  <a href="#" for="/DZSBB/images/ln2.jpg" target="_blank"></a>
+  <a href="#" for="/DZSBB/images/ln3.jpg" target="_blank"></a>
+  <a href="#" for="/DZSBB/images/ln4.jpg" target="_blank"></a>
+  </div>
+        </td>
+
+      </tr>
+      
+    </table></td>
+  </tr>
+</table>
+ 
+<table width="1003" border="0" cellpadding="0" cellspacing="0" style="margin-top:30px;position:absolute;  top:80%; left:12%;" align="center">
+  <tr>
+    <td height="107" background="/DZSBB/images/login/brand_bg.jpg">
+	    &nbsp;</td>
+  </tr>
+</table>
+ 
+<center><table width="859" border="0" cellpadding="0" cellspacing="0"  class="Bottom" style="margin-left:auto;margin-right:auto;position:absolute;  top:89%; left:12%;" align="center">
+  <tr>
+    <td height="26" align="right"><div style="position:absolute;  top:89%; left:45%; font-size:13px;">版权所有&copy;&nbsp;<strong style="font-size:13px;" >第三采油厂地质所</strong></div>   </td>
+  </tr>
+  </table></center>
+<br />
+<script type="text/javascript">
+
+    document.forms['theForm'].elements['username'].focus();
+    function myAddPanel(title, url, desc) {
+        if ((typeof window.sidebar == 'object') && (typeof window.sidebar.addPanel == 'function')) {
+            window.sidebar.addPanel(title, url, desc);
+        } else {
+            window.external.AddFavorite(url, title);
+        }
+    }
+    function validate() {
+        if (document.theForm.username.value == '') {
+            alert('请输入用户名!');
+            document.theForm.username.focus();
+            return false;
+        }
+        if (document.theForm.password.value == '') {
+            alert('请输入密码!');
+            document.theForm.password.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+</center>
+</body>
+</html>
+<script language="JavaScript">
+    function f() {
+        var g_sec = 5          //几秒后切换图片
+        var g_items = new Array()
+        var g_div = document.getElementById("g_div")
+        var g_img = document.getElementById("g_img")
+        var g_imglink = g_img.parentElement
+        var arr = g_div.getElementsByTagName("A")
+        var arr_length = arr.length
+        var g_index = 1
+
+        var show_img = function (n) {
+            if (/\d+/.test(n)) {
+                var prev = g_index + 1
+                g_index = n - 1
+            } else {
+                var prev = (g_index > arr.length) ? (arr_length - 1) : g_index + 1
+                g_index = (g_index < arr_length - 2) ? (++g_index) : 0
+            }
+            if (document.all) {
+                //g_img.filters.revealTrans.Transition = 23;
+                //g_img.filters.revealTrans.apply();
+                //g_img.filters.revealTrans.play();
+            }
+            arr[prev].className = "b"
+            arr[g_index + 1].className = "bhover"
+            g_img.src = g_items[g_index].img.src
+            g_img.title = g_items[g_index].txt
+            g_imglink.href = g_items[g_index].url
+            g_imglink.target = g_items[g_index].target
+
+        }
+
+        for (var i = 1; i < arr_length; i++) {
+            g_items.push({ txt: arr[i].innerHTML,
+                url: arr[i].href,
+                target: arr[i].target,
+                img: (function () { var o = new Image; o.src = arr[i].getAttribute("for"); return o })()
+            })
+            arr[i].title = arr[i].innerHTML
+            arr[i].innerHTML = [i, "&nbsp;"].join("")
+            arr[i].className = "b"
+            arr[i].onclick = function () {
+                event.returnValue = false;
+                show_img(event.srcElement.innerText)
+            }
+        }
+        show_img(1)
+       // var t = window.setInterval(show_img, g_sec * 500)
+       // g_img.onmouseover = function () { window.clearInterval(t) }
+       // g_img.onmouseout = function () { t = window.setInterval(show_img, g_sec * 500) }
+    }
+
+    //window.attachEvent("onload", f);
+  </script>

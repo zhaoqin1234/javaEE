@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>月配注数据管理</title>
+</head>
+<body>
+	<div id="div1">
+		<div class="mini-toolbar" id="toolbar1">
+			<span>日期:</span>
+			<input name="time" type="text" id="time" class="mini-monthpicker" format="yyyy-MM" allowinput="true"/>
+			<span>状态:</span>
+			<input id="state_id" class="mini-combobox" showClose="true" style="width:150px;" url="<%=basePath%>/data/state.txt" 
+				allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"/>
+			<a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+            <a class="mini-button" iconCls="icon-download" onclick="exportData()">导出</a>
+            <a class="mini-button" iconCls="icon-ok" onclick="submitData()">批量提交</a>
+            <a class="mini-button" iconCls="icon-undo" onclick="unSubmitData()">撤销提交</a>
+            <a class="mini-button" id="saveId" iconCls="icon-save" onclick="save()">保存</a>
+            <div style="float:right">
+		        <a class="mini-button" iconCls="icon-add" onclick="add()">新增</a>
+		        <a class="mini-button" iconCls="icon-edit" onclick="edit()">编辑</a>
+		        <a class="mini-button" iconCls="icon-remove" onclick="remove()">删除</a>
+		       <!--  <a class="mini-button" iconCls="icon-download" onclick="download()">模板下载</a>
+		        <input type="file" name="uploadFile" id="uploadFile" onchange="uploadFile(this)" style="display: none;" />
+		        <a class="mini-button" iconCls="icon-upload" onclick="openFileUpload()">批量导入</a> -->
+		        <a class="mini-button" iconCls="icon-upload" onclick="openUploadFileDialog()">批量导入</a>
+        	</div>
+		</div>
+		<div id="datagrid" class="mini-datagrid mini-pager" style="width:100%;height:98%;" url="<%=basePath%>monthPZ/getMonthPZList" pageSize="20" sizeList="[10,20,30,40,50,100,200,500,1000]"  
+			idField="id" allowResize="true" showPager="true" sortMode="client" showReloadButton="false" multiSelect="true" 
+			allowCellEdit="true" allowCellSelect="true" allowUnselect="true" ondrawcell="">
+			<div property="columns">
+				<div type="checkcolumn" ></div>
+				<div type="indexcolumn" width="50" headeralign="center" headerstyle="font-weight: bold;">序号</div>
+				<div field="site_name" headerAlign="center" align="center" headerStyle="font-weight: bold;"  renderer="">工区
+					<%-- <input property="editor" class="mini-combobox" textField="name" valueField="id"  url="<%=basePath%>org/getAllOrg"
+						style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." onvaluechanged=""
+						required="true" /> --%>
+				</div>
+          		<div field="yc_name" headerAlign="center" align="center" headerStyle="font-weight: bold;" >油藏
+          			<!-- <input property="editor" id="site_id" class="mini-combobox" textField="name" valueField="id"
+						style="width:150px;" url="" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick=""/> -->
+          		</div>
+          		<div field="well_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">井号
+          		<!-- 	<input property="editor" name="well_id" id="well_id" class="mini-combobox" textField="wellCommonName" valueField="wellId" 
+						style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..."
+						required="true"  onvaluechanged=""/>  -->
+          		</div>
+          		<div field="dzpz" headerAlign="center" align="center" headerStyle="font-weight: bold;" vtype="required;float" floatErrorText="请输入数字"  >地质配注
+          			<input property="editor" class="mini-textbox" style="width:100%;" minWidth="120" />
+          		</div>          		
+          		<div field="khpz" headerAlign="center" align="center" headerStyle="font-weight: bold;" vtype="float" floatErrorText="请输入数字"  >考核配注
+          			<input property="editor" class="mini-textbox" style="width:100%;" minWidth="120" />
+          		</div>
+          		<div field="last_kh" headerAlign="center" align="center" headerStyle="font-weight: bold;" >上月考核配注</div>
+          		<div header="差值" headeralign="center" headerstyle="font-weight: bold;">
+          			<div property="columns">
+	                    <div field="cz_sj_jh" width="120" headeralign="center" align="center" 
+	                    	headerstyle="font-weight: bold;" >本月地质<br />与本月考核</div>
+	                    <div field="cz_sj_sj" width="120" headeralign="center" align="center" 
+	                    	headerstyle="font-weight: bold;" >本月考核<br />与上月考核</div>
+	                 <!--    <div field="cz_jh_jh" width="120" headeralign="center" align="center" 
+	                    	headerstyle="font-weight: bold;" >本月计划<br />与上月计划</div> -->
+	                </div>
+          		</div>
+          		<div field="tj_starts" headerAlign="center" align="center" headerStyle="font-weight: bold;">提交状态</div>
+          		<div field="sh_starts" headerAlign="center" align="center" headerStyle="font-weight: bold;">审核状态</div>
+          		<div field="stime" headerAlign="center" align="center" headerStyle="font-weight: bold;" dateFormat="yyyy-MM" vtype="required" >数据日期
+          			<!-- <input property="editor" class="mini-monthpicker" allowinput="true" /> -->
+          		</div>
+          		<div field="mark" headerAlign="center" align="center" headerStyle="font-weight: bold;" property="editor">备注
+          			<input property="editor" class="mini-textbox" style="width:100%;" minWidth="120" />
+          		</div>        
+            </div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var HeightEx = document.documentElement.clientHeight;
+	document.getElementById("div1").style.height = HeightEx - 50 + "px";
+	var time,title,state_id;
+	time = getTodayMonth();
+	mini.parse();
+	mini.get("time").setValue(time);
+	var grid = mini.get("datagrid");
+	var stateObj = mini.get("state_id");
+	grid.frozenColumns(0,4);
+	//查询
+	search();
+	function aa(e){
+		var data = e.record;
+		if(e.field == "site_id"){
+			e.cellHtml = data.site_name;
+		}
+		if(e.field == "yc_id"){
+			e.cellHtml = data.yc_name;
+		}
+		if(e.field == "well_id"){
+			e.cellHtml = data.well_name;
+		}
+	}
+	function search(){
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("日期不能为空");
+			return;
+		}
+		state_id = stateObj.getValue();
+		var pIndex = grid.pageIndex;
+		var pSize = grid.pageSize;
+		grid.load({stime:time,tj_starts:state_id});
+	}
+	//保存修改
+	function save(){
+		grid.validate();
+        if (grid.isValid() == false) {
+            var error = grid.getCellErrors()[0];
+            grid.beginEditCell(error.record, error.column);
+            return;
+        }
+		var data = grid.getChanges();
+		var json = mini.encode(data);
+		if(data.length > 0){
+			
+			$.each(data,function(index,i){
+				var  cc=i.tj_starts;
+				if(i.tj_starts == "未提交"){
+					i.tj_starts = "0";
+					i.sh_starts = "0";
+					/* if(typeof(i.stime) == "object"){
+						i.stime = getMonth(i.stime);
+					} */
+					saveData(i);
+					search();
+				}else{
+					mini.alert("已提交的数据不可修改");
+					search();
+				}
+	        });
+		}
+		
+	}
+	function saveData(obj){
+		$.ajax({
+            url: "<%=basePath%>monthPZ/update",
+            dataType:'text',
+            type:"post",
+            data: obj,
+            async: false,
+            success: function (text) {
+            	if(text == "修改成功！！！"){
+            		showTips(obj.well_name)
+              	  	search();
+            	}else{
+            		mini.alert(text);
+            	}
+            },
+            error: function(){
+            	
+            }
+        });
+	}
+	//新增
+	function add(){
+		mini.open({
+            url: "<%=basePath%>waterInjection/monthlyDataManagementEdit",
+            title: "新增月配注数据", 
+            width: 550, 
+            height: 350,
+            onload: function () {
+                var iframe = this.getIFrameEl();
+                var data = {action: "new"};
+                iframe.contentWindow.SetData(data);
+            },
+            ondestroy: function (action) {
+          	  search();
+            }
+        });
+	}
+	//修改
+	function edit(){
+		var rows = grid.getSelecteds();
+		if(rows.length > 0){
+			if(rows[0].tj_starts == "未提交"){
+				mini.open({
+	                url:"<%=basePath%>waterInjection/monthlyDataManagementEdit",
+	                title: "编辑新井生产运行科数据", 
+	                width: 550, 
+	                height: 350,
+	                onload: function () {
+	                    var iframe = this.getIFrameEl();
+	                    var data = { action: "edit", row: rows[0]};
+	                    iframe.contentWindow.SetData(data);
+	                },
+	                ondestroy: function (action) {
+	                	search();
+	                }
+	            });
+			}else{
+				alert("已提交的数据不可修改");
+			}
+		}else{
+			alert("请选中一条记录");
+		}
+	}
+	//删除
+	function remove(){
+		var rows = grid.getSelecteds();
+		if (rows.length > 0){
+			var ids = [];
+	    	$.each(rows,function(index,i){
+	    		if(i.tj_starts == "未提交"){
+	    			ids.push("\'" + i.seq + "\'");
+	    		}
+	        });
+	    	var seqlist = ids.join(",");
+	    	if(seqlist.length > 0){
+	    		if (confirm("确定删除选中记录？")){
+					$.ajax({
+	                    url: "<%=basePath%>monthPZ/delMonthPZList",
+	                    dataType:'text',
+	                    async: false,
+	                    data: {
+	                    	seqlist: seqlist
+	                    },
+	                    success: function (text) {
+	                  		search();
+	                    }
+	                });
+				}
+	    	}else{
+	    		alert("已提交的数据不可删除");
+	    	}
+		}else{
+			mini.alert("请选中一条记录");
+		}
+	}
+	//导出
+	function exportData(){
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("日期不能为空");
+			return;
+		}
+		state_id = stateObj.getValue();
+		title = time.replace("-","年") + "月配注数据管理";
+		var url='<%=basePath%>monthPZ/dwnloadQueryData?stime='+time+'&tj_starts='+state_id+'&fileName='+title;
+		window.location.href =encodeURI(url);
+	}
+	//批量提交
+	function submitData(){
+		var rows = grid.getSelecteds();
+		if(rows.length > 0){
+			var ids = [];
+			$.each(rows,function(index,i){
+				if(i.tj_starts == "未提交"){
+					ids.push("\'" + i.seq + "\'");
+				}
+	        });
+			var seqlist = ids.join(",");
+			if(seqlist.length > 0){
+				$.ajax({
+	                url: "<%=basePath%>monthPZ/submittMonthP",
+	                contentType: 'application/json',
+	                dataType:'text',
+	                async: false,
+	                data: {
+	                	seqlist: seqlist
+	                },
+	                success: function (text) {
+	              		search();
+	                }
+	            });
+			}else{
+				mini.alert("请选择未提交的数据");
+			}			
+		}else{
+			mini.alert("请至少选择一条数据");
+		}
+	}
+	//撤销提交
+	function unSubmitData(){
+		var rows = grid.getSelecteds();
+		if(rows.length > 0){
+			var ids = [];
+			$.each(rows,function(index,i){
+				if(i.tj_starts == "已提交" && i.sh_starts == "未审核"){
+					ids.push("\'" + i.seq + "\'");
+				}
+	        });
+			var seqlist = ids.join(",");
+			if(seqlist.length > 0){
+				$.ajax({
+	                url: "<%=basePath%>monthPZ/unSubmittMonthP",
+	                contentType: 'application/json',
+	                dataType:'text',
+	                async: false,
+	                data: {
+	                	seqlist: seqlist
+	                },
+	                success: function (text) {
+	              		search();
+	                }
+	            });
+			}else{
+				mini.alert("请选择已提交、未审核的数据");
+			}			
+		}else{
+			mini.alert("请至少选择一条数据");
+		}
+	}
+	function openFileUpload(){
+  		$("#uploadFile").click();
+  	}
+	function uploadFile(obj){
+		var fileId = obj.id;
+		var fileName = obj.value;
+		if(!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx")){
+			$('#uploadFile').val('');  // 解决相同文件只能上传一次的问题
+			mini.alert("文件格式不正确");
+			return;
+		}
+		$.ajaxFileUpload({
+	        url: '?fileId=' + fileId,
+	        secureUri: false,
+	       	fileElementId: fileId,
+	        type: 'GET',
+	        dataType: 'json',
+	        async: false,
+	        success: function(data) {  //服务器成功响应处理函数
+	        	$('#uploadFile').val('');  // 解决相同文件只能上传一次的问题
+	        	if(data == ""){
+	        		search();
+	        	}else{
+	        	}
+	        },
+	        error: function() { //服务器响应失败处理函数
+	        	$('#uploadFile').val('');  // 解决相同文件只能上传一次的问题
+	        	mini.alert("导入失败!");
+	        }
+	    });
+	}
+	//批量导入
+	function openUploadFileDialog(){
+		mini.open({
+            url:"<%=basePath%>waterInjection/monthlyConsolidatedExport",
+            title: "月配注数据管理批量导入", 
+            width: 550, 
+            height: 350,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            	search();
+            }
+        });
+	}
+	
+	function showTips(id) {
+        var x = document.getElementById("saveId").value;
+        var y = document.getElementById("saveId").value;
+        var state = "success";
+        mini.showTips({
+            content: '<b>成功</b> <br/>数据保存成功',
+            state: state,
+            x: x,
+            y: y + 30,
+            timeout: 3000
+        });
+    }
+</script>
+</html>

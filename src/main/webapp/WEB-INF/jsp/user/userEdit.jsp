@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>用户信息</title>
+</head>
+<body>
+	<form id="form1" method="post">
+        <fieldset style="border:solid 1px #aaa;padding:3px;">
+            <legend >用户信息</legend>
+            <div style="padding:5px;">
+            	<input id="id" name="id" class="mini-hidden"/>
+	           	<table style="table-layout:fixed;">
+		            <tr>
+		                <td style="width:85px;">部门：</td>
+		                <td style="width:150px;">    
+		                    <input name="deptId" id="deptId" class="mini-treeselect" textField="name" valueField="id" url="<%=basePath%>deptment/getDeptmentsByDeptment"
+								parentField="pid" style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..."  required="true" />
+		                </td>
+		                <td style="width:85px;">用户名：</td>
+		                <td >    
+		                    <input id="name" name="name" class="mini-textbox" required="true" />
+		                </td>
+		            </tr>
+	                <tr>
+	                	<td >姓名：</td>
+	                    <td > 
+	                        <input name="nickname" class="mini-textbox" required="true" />
+	                    </td>
+	                	<td >性别：</td>
+	                    <td >    
+	                        <input name="gender" class="mini-combobox"  showClose="true" url="<%=basePath%>/data/gender.txt" 
+								style="width:150px;" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick" required="true"/>
+	                    </td>
+	                </tr> 
+	                 <tr>
+	                	<td >密码：</td>
+	                    <td > 
+	                        <input name="passWord" class="mini-textbox" required="true" />
+	                    </td>
+	                	<td ></td>
+	                    <td >    
+	                        
+	                    </td>
+	                </tr> 
+	                <tr>
+	                	<td >年龄：</td>
+	                    <td >    
+	                        <input name="age" changeOnMousewheel="false" class="mini-spinner" allowNull="false" maxValue="200" 
+								minValue="10" value="25" />
+	                    </td>
+	                    <td >电话：</td>
+	                    <td >
+	                    	<input name="telNumber" class="mini-textbox" vtype="int" required="true" intErrorText="请输入数字" />
+						</td>
+	                </tr>
+	                <tr>
+	                	<td >地址：</td>
+	                	<td colspan="3">    
+	                    	<input name="address" class="mini-textarea" style="width:100%"/>
+	                	</td>
+	                </tr>
+            	</table>
+        	</div>
+        </fieldset>
+    </form>
+    <div style="text-align:center;padding:10px;">               
+    	<a class="mini-button" onclick="saveData()" style="width:60px;margin-right:20px;">提交</a>       
+    	<a class="mini-button" onclick="onCancel" style="width:60px;">返回</a>       
+    </div> 
+</body>
+<script type="text/javascript">
+	var action;
+	mini.parse();
+	var form = new mini.Form("form1");
+	//初始函数
+	function SetData(obj){
+		var data = mini.clone(obj);
+		action = data.action;
+		if(action == "edit"){
+			mini.get("name").allowInput = false;
+		}
+		form.setData(data.row);
+    	form.setChanged(false);
+	}
+	//保存数据
+	function saveData(){
+		form.validate();
+		if (form.isValid() == false){
+			return;
+		}
+		var data = form.getData();
+		data.deptName = mini.get("deptId").getText();
+		var url="";
+		if(action == "edit"){
+			url = "<%=basePath%>user/updUser";
+		}else{
+			url = "<%=basePath%>user/addUser";
+			if(isRepeat(data.name)){
+				mini.alert("用户名重复");
+				return;
+			}
+		}
+		$.ajax({
+            url: url,
+	        type: 'post',
+	        dataType:'text',
+            data: data,
+            cache: false,
+            async: false,
+            success: function (text) {
+                CloseWindow("save");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                mini.alert("保存失败");
+            }
+        });
+	}
+	//判断重名
+	function isRepeat(name){
+		var flag = false;
+		$.ajax({
+            url: "<%=basePath%>user/getUserByName",
+	        type: 'post',
+	        dataType: 'json',
+	        cache: false,
+            async: false,
+            data: {
+            	name: name
+            },
+            success: function (data) {
+            	console.log(data);
+                if(data.length > 0){
+                	flag = true;
+                }
+            }
+        });
+		debugger;
+		return flag;
+	}
+	//取消
+	function onCancel(){
+		CloseWindow("cancel");
+	}
+	function CloseWindow(action) {            
+        if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+                return false;
+            }
+        }
+        if (window.CloseOwnerWindow){
+        	return window.CloseOwnerWindow(action);
+        }else{
+        	window.close();            
+        }
+    }
+</script>
+</html>

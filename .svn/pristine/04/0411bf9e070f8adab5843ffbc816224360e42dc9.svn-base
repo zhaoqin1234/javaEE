@@ -1,0 +1,22 @@
+package com.hrxt.mapper;
+
+import java.util.Map;
+
+public interface OrgMapper {
+	/**
+	 * 获取所有工区的 id name
+	 * @param param
+	 * @return
+	 */
+	String getAllOrgMsg(Map<String, Object> param);;
+	
+	
+	/**
+	 * 根据orgid获取子id name
+	 * @param param
+	 * @return
+	 */
+	String getOrgMsgByOrgId(Map<String, Object> param);;
+	
+	
+}

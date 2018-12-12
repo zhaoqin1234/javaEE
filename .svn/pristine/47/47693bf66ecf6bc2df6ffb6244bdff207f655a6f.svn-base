@@ -1,0 +1,146 @@
+package com.hrxt.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hrxt.mapper.WaterJCJHMapper;
+import com.hrxt.pojo.OilJCJH;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.WaterJCJH;
+import com.hrxt.service.WaterJCJHService;
+
+import oracle.jdbc.OracleTypes;
+
+
+/**
+ * 水井检测计划  services
+ * @author ZhaoQin
+ *
+ */
+@Service
+@Transactional
+public class WaterCJHServiceImpl implements WaterJCJHService {
+
+	@Autowired
+	private WaterJCJHMapper waterJCJHMapper;
+
+	@Override
+	public Map<String, Object> getWaterJCJHList(WaterJCJH waterJCJH, Page<List<WaterJCJH>> page) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", waterJCJH.getSeq());
+		paramMap.put("i_site_id", waterJCJH.getSite_id());
+		paramMap.put("i_yc_id", waterJCJH.getYc_id());
+		paramMap.put("i_well_id", waterJCJH.getWell_id());
+		paramMap.put("i_cs_type_id", waterJCJH.getCs_type_id());
+		paramMap.put("i_tj_status", waterJCJH.getTj_status());
+		paramMap.put("i_sh_status", waterJCJH.getSh_status());
+		paramMap.put("i_startdate", waterJCJH.getStartDate());
+		paramMap.put("i_enddate", waterJCJH.getEndDate());
+		paramMap.put("datetype", waterJCJH.getDateType());
+		paramMap.put("i_p_index", page.getPageIndex());
+		paramMap.put("i_p_size", page.getPageSize());
+		paramMap.put("v_totalrecords", null);
+		paramMap.put("o_my_cur", OracleTypes.CURSOR);
+		waterJCJHMapper.p_get_water_jcjh(paramMap);
+		List<WaterJCJH> blockList = (List<WaterJCJH>)paramMap.get("o_my_cur");
+		Integer cnt = (Integer)paramMap.get("v_totalrecords");
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("data", blockList);
+		map.put("total", cnt);
+		return map;
+	}
+	
+
+	/**
+	 * 导出模板传递以下4个参数过滤
+	 * i_site_id
+	 * i_yc_id
+	 * i_stime
+	 * i_well_id
+	 * @param oilJCJH
+	 * @return
+	 */
+	@Override
+	public List<WaterJCJH> getOilJCJHExcelMoBan(WaterJCJH waterJCJH) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_site_id", waterJCJH.getSite_id());
+		paramMap.put("i_yc_id", waterJCJH.getYc_id());
+		paramMap.put("i_stime", waterJCJH.getStime());
+		paramMap.put("i_well_id", waterJCJH.getWell_id());
+		paramMap.put("o_my_cur", OracleTypes.CURSOR);
+		waterJCJHMapper.p_dzs_water_jcjh_mb(paramMap);
+		List<WaterJCJH> blockList = (List<WaterJCJH>)paramMap.get("o_my_cur");
+		return blockList;
+	} 
+	
+	
+	
+	/**
+	 * 新增或者更新  油井检测计划
+	 */
+	@Override
+	public String insertOrUpdate(WaterJCJH waterJCJH) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", waterJCJH.getSeq());
+		paramMap.put("i_site_name", waterJCJH.getSite_name());
+		paramMap.put("i_yc_name", waterJCJH.getYc_name());
+		paramMap.put("i_well_name", waterJCJH.getWell_name());
+		paramMap.put("i_cs_type_name", waterJCJH.getCs_type_name());
+		paramMap.put("i_well_section", waterJCJH.getWell_section());
+		paramMap.put("i_thickness", waterJCJH.getThickness());
+		paramMap.put("i_cs_purpose", waterJCJH.getCs_purpose());
+		paramMap.put("i_cs_explaim", waterJCJH.getCs_explaim());
+		paramMap.put("i_last_success_date", waterJCJH.getLast_success_date());
+		paramMap.put("i_recently_fail_date", waterJCJH.getRecently_fail_date());
+		paramMap.put("i_recently_revise_mesg", waterJCJH.getRecently_revise_mesg());// function 给时间
+		paramMap.put("i_level_demand", waterJCJH.getLevel_demand());
+		paramMap.put("i_tc_date", waterJCJH.getTc_date());
+		paramMap.put("i_fk_cd_date", waterJCJH.getFk_cd_date());
+		paramMap.put("i_wcd_mesg", waterJCJH.getWcd_mesg());
+		paramMap.put("i_success_date", waterJCJH.getSuccess_date());
+		paramMap.put("i_fail_mesg", waterJCJH.getFail_mesg());
+		paramMap.put("i_stime", waterJCJH.getStime());
+		paramMap.put("i_plies_num", waterJCJH.getPlies_num());
+		paramMap.put("i_cs_claim", waterJCJH.getCs_claim());
+		paramMap.put("i_cs_water_injection",waterJCJH.getCs_water_injection());
+		paramMap.put("o_mesg", "");
+		waterJCJHMapper.p_water_jcjh_insert_up(paramMap);
+		return (String)paramMap.get("o_mesg");
+	}
+
+
+	/**
+	 * 未实现该方法
+	 */
+	@Override
+	public List<String> batchInsertOrUpdate(List<WaterJCJH> oilJCJHlist) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	@Override
+	public String delOneWaterJCJH(String sep) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", sep);
+		paramMap.put("o_mesg", sep);
+		waterJCJHMapper.p_del_dzs_water_jcjh(paramMap);
+		return (String) paramMap.get("o_mesg");
+	}
+
+	@Override
+	public String delListWaterJCJH(String sep) {
+		return delOneWaterJCJH(sep);
+	}
+
+
+	
+
+	
+}

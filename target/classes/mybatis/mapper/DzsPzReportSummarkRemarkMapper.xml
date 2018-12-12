@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrxt.mapper.DzsPzReportSummarkRemarkMapper" >
+  <resultMap id="BaseResultMap" type="com.hrxt.pojo.DzsPzReportSummarkRemark" >
+    <result column="SUMMARK_REMARK_ID" property="summarkRemarkId" jdbcType="VARCHAR" />
+    <result column="SUMMARK_REMARK" property="summarkRemark" jdbcType="VARCHAR" />
+    <result column="SUMMARK_VERIFIER" property="summarkVerifier" jdbcType="VARCHAR" />
+    <result column="SUMMARK_APPROVER" property="summarkApprover" jdbcType="VARCHAR" />
+    <result column="SUMMARK_DATE" property="summarkDate" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    SUMMARK_REMARK_ID, SUMMARK_REMARK, SUMMARK_VERIFIER, SUMMARK_APPROVER, SUMMARK_DATE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hrxt.pojo.DzsPzReportSummarkRemarkExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from DZS_PZ_REPORT_SUMMARK_REMARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.hrxt.pojo.DzsPzReportSummarkRemarkExample" >
+    delete from DZS_PZ_REPORT_SUMMARK_REMARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hrxt.pojo.DzsPzReportSummarkRemark" >
+    insert into DZS_PZ_REPORT_SUMMARK_REMARK (SUMMARK_REMARK_ID, SUMMARK_REMARK, SUMMARK_VERIFIER, 
+      SUMMARK_APPROVER, SUMMARK_DATE)
+    values (#{summarkRemarkId,jdbcType=VARCHAR}, #{summarkRemark,jdbcType=VARCHAR}, #{summarkVerifier,jdbcType=VARCHAR}, 
+      #{summarkApprover,jdbcType=VARCHAR}, #{summarkDate,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hrxt.pojo.DzsPzReportSummarkRemark" >
+    insert into DZS_PZ_REPORT_SUMMARK_REMARK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="summarkRemarkId != null" >
+        SUMMARK_REMARK_ID,
+      </if>
+      <if test="summarkRemark != null" >
+        SUMMARK_REMARK,
+      </if>
+      <if test="summarkVerifier != null" >
+        SUMMARK_VERIFIER,
+      </if>
+      <if test="summarkApprover != null" >
+        SUMMARK_APPROVER,
+      </if>
+      <if test="summarkDate != null" >
+        SUMMARK_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="summarkRemarkId != null" >
+        #{summarkRemarkId,jdbcType=VARCHAR},
+      </if>
+      <if test="summarkRemark != null" >
+        #{summarkRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="summarkVerifier != null" >
+        #{summarkVerifier,jdbcType=VARCHAR},
+      </if>
+      <if test="summarkApprover != null" >
+        #{summarkApprover,jdbcType=VARCHAR},
+      </if>
+      <if test="summarkDate != null" >
+        #{summarkDate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hrxt.pojo.DzsPzReportSummarkRemarkExample" resultType="java.lang.Integer" >
+    select count(*) from DZS_PZ_REPORT_SUMMARK_REMARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update DZS_PZ_REPORT_SUMMARK_REMARK
+    <set >
+      <if test="record.summarkRemarkId != null" >
+        SUMMARK_REMARK_ID = #{record.summarkRemarkId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summarkRemark != null" >
+        SUMMARK_REMARK = #{record.summarkRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summarkVerifier != null" >
+        SUMMARK_VERIFIER = #{record.summarkVerifier,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summarkApprover != null" >
+        SUMMARK_APPROVER = #{record.summarkApprover,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summarkDate != null" >
+        SUMMARK_DATE = #{record.summarkDate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update DZS_PZ_REPORT_SUMMARK_REMARK
+    set SUMMARK_REMARK_ID = #{record.summarkRemarkId,jdbcType=VARCHAR},
+      SUMMARK_REMARK = #{record.summarkRemark,jdbcType=VARCHAR},
+      SUMMARK_VERIFIER = #{record.summarkVerifier,jdbcType=VARCHAR},
+      SUMMARK_APPROVER = #{record.summarkApprover,jdbcType=VARCHAR},
+      SUMMARK_DATE = #{record.summarkDate,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>

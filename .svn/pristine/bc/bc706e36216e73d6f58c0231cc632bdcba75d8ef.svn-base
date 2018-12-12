@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>月配注报表</title>
+</head>
+<body>
+	<div id="div1">
+		<div class="mini-toolbar" id="toolbar1">
+			<span>工区:</span>
+           	<input id="org_id" class="mini-combobox" textField="name" valueField="id" showClose="true" onvaluechanged="getSiteList"
+				style="width:150px;" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"
+				url="<%=basePath%>org/getAllOrg" />
+			<span>油藏:</span>
+			<input id="site_id" class="mini-combobox" textField="name" valueField="id" showClose="true"
+				style="width:150px;" url="" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"/>
+			<span>日期:</span>
+			<input name="time" type="text" id="time" class="mini-monthpicker" format="yyyy-MM" allowinput="true"/>
+			<a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+            <a class="mini-button" iconCls="icon-download" onclick="download()">导出</a>
+            <a class="mini-button" iconCls="icon-download" onclick="BBdownload()">报表导出</a>
+		</div>
+	<!-- 	<div style="height: 30px;margin-top:-10px;">
+	       <h1 id="title" align="center" style="font-weight: bold;">
+                <label id="lblTitle">
+                </label>
+            </h1>
+	   	</div> -->
+		<div id="datagrid" class="mini-datagrid" style="width:100%;height:100%;" url="<%=basePath%>monthPZ/getMonthPZList" pageSize="20" showPager="true" sizeList="[10,20,30,40,50,100,200,500,1000]"
+			idField="id" allowResize="true" sortMode="client" multiSelect="false" showReloadButton="false" allowRowSelect="false" >
+			<div property="columns">
+				<div type="indexcolumn" width="50" headeralign="center" headerstyle="font-weight: bold;">序号</div>
+				<div field="site_name"name="site_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">工区</div>
+          		<div field="yc_name" name="yc_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">油藏</div>
+          		<div field="well_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">井号</div>
+          		<div field="dzpz" headerAlign="center" align="center" headerStyle="font-weight: bold;">地质配注</div>
+          		<div field="khpz" headerAlign="center" align="center" headerStyle="font-weight: bold;">考核配注</div>
+          		<div field="last_kh" headerAlign="center" align="center" headerStyle="font-weight: bold;">上月考核配注</div>
+          		<div field="mark" headerAlign="center" align="center" headerStyle="font-weight: bold;">备注</div>
+            </div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var HeightEx = document.documentElement.clientHeight;
+	document.getElementById("div1").style.height = HeightEx - 50 + "px";
+	var time,title,org_id,site_id;
+	time = getTodayMonth();
+	mini.parse();
+	mini.get("time").setValue(time);
+	var grid = mini.get("datagrid");
+	var orgObj = mini.get("org_id");   //工区
+	var siteObj = mini.get("site_id"); //断块
+	grid.frozenColumns(0,4);
+	search();
+	<%-- function getOrgList(){
+		var url = "<%=basePath%>org/getAllOrg";
+		orgObj.setUrl(url);
+	} --%>
+	function getSiteList(){
+		org_id =  orgObj.getValue();
+		var url = "<%=basePath%>block/getBlock?orgId=" + org_id;
+		siteObj.setUrl(url);
+	}
+	/* function setTitle(){
+		title = orgObj.getText() + "配注公报";
+		document.getElementById("lblTitle").innerText = title;
+	} */
+	function search(){
+//		setTitle();
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("请选择时间");
+			return;
+		}
+		org_id = orgObj.getValue();
+		site_id = siteObj.getValue();
+
+		grid.load({stime:time,site_id:org_id,yc_id:site_id});
+	 
+	}
+	
+	grid.on("load", function () {
+		grid.mergeColumns(["site_name","yc_name"]);//合并行
+	} ) 
+	function download(){
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("请选择时间");
+			return;
+		}
+		org_id = orgObj.getValue();
+		site_id = siteObj.getValue();
+		title = time.replace("-","年") + "月配注综合查询数据";
+		var url='<%=basePath%>monthPZ/dwnloadQueryData?stime='+time+'&site_id='+org_id+'&yc_id='+site_id+'&fileName='+title;
+		window.location.href =encodeURI(url);
+	}
+function mergeCell(e){
+		var marges=[];
+		var rowIndex=0;
+		var columnIndex=0;
+		var rowSpan=1;
+		var colSpan=1;
+		var firstValue="";
+		var fields=["1","2"];
+		var currentValue="";
+		if(e.data.length>1){
+			for(var k=0;k<2;k++){
+				firstValue=e.data[0].field[k];
+				columnIndex=k;
+				rowIndex=0;
+				rowSpan=1;
+				for(var i=1;i<e.data.length;i++){
+					currentValue=e.data[i].field[k];
+					if(firstValue==currentValue){
+						rowSpan++;
+					}else{
+						firstValue=e.data[i].field[k];
+						if(rowSpan > 1){
+							marges.push({rowIndex:rowIndex,columnIndex:columnIndex,rowSpan:rowSpan,colSpan:colSpan});
+						}else if(i==e.data.length-1){
+							if( currentValue.indexOf("合计")>0 && k==0){
+								marges.push({rowIndex:rowIndex,columnIndex:columnIndex,rowSpan:rowSpan,colSpan:4});
+							}
+							if(currentValue.indexOf("小计")>0 && k==1){
+								marges.push({rowIndex:rowIndex,columnIndex:columnIndex,rowSpan:rowSpan,colSpan:3});
+							}
+						}
+						rowSpan=1;
+						rowIndex=i;
+					}
+				}
+			}
+		}
+		grid.mergeCells(marges);
+	} 
+	
+	function BBdownload(){
+		
+		window.location.href="<%=basePath%>monthPZ/downloadMothPZBB";
+		
+	}
+	
+</script>
+</html>

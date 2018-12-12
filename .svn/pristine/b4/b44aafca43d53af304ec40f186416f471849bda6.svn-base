@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.ButtonMapper">
+
+	<insert id="insertButton" parameterType="user">
+		insert into AUTH_BUTTON
+			(id,
+			key,
+			name,
+			status,
+			mark,
+			menuId) 
+		values(
+			#{id, mode=IN, jdbcType=VARCHAR},
+			#{key, mode=IN, jdbcType=VARCHAR},
+			#{name, mode=IN, jdbcType=VARCHAR},
+			#{status, mode=IN, jdbcType=VARCHAR},
+			#{mark, mode=IN, jdbcType=VARCHAR},
+			#{menuId, mode=IN, jdbcType=VARCHAR}
+			)
+	</insert>
+
+	
+	
+	<delete id="deleteButtonByButton">
+		delete 
+		from 
+			AUTH_BUTTON 
+		where 
+			id = #{id, mode=IN, jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteButtonById">
+		delete 
+		from 
+			UTH_BUTTON 
+		where 
+			id = #{value}
+	</delete>
+	<delete id="deleteButtonByIds">
+		delete 
+		from 
+			AUTH_BUTTON 
+		where 
+			id in ${value}
+	</delete>	
+
+
+	<update id="updateButton" parameterType="Menu">
+		update AUTH_BUTTON 
+		set 
+			id=#{id, mode=IN, jdbcType=VARCHAR},
+			key=#{key, mode=IN, jdbcType=VARCHAR},
+			name=#{name, mode=IN, jdbcType=VARCHAR},
+			status=#{status, mode=IN, jdbcType=VARCHAR},
+			menuId=#{menuId, mode=IN, jdbcType=VARCHAR},
+			mark=#{mark, mode=IN, jdbcType=VARCHAR}
+		where 
+			id = #{id}
+	</update>
+	
+	
+	<select id="getButtons" resultType="Button">
+		select 
+			id,
+			key,
+			name,
+			status,
+			mark,
+			menuId
+		from AUTH_BUTTON
+	</select>
+	<select id="getButtonsByUser" parameterType="User" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.status,
+			b.mark,
+			b.menuId 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb,
+			 AUTH_ROLE_MENU rm,
+			 AUTH_USER_ROLE ur
+		where 
+			b.id = mb.BUTTON_ID and
+			mb.MENU_ID_ID = rm.MENU_ID and
+			rm.role_id = ur.ROLE_ID and
+			ur.USER_ID =  #{value}
+	</select>
+	<select id="getButtonsByRole" parameterType="Role" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.status,
+			b.mark,
+			b.menuId 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb,
+			 AUTH_ROLE_MENU rm
+		where 
+			b.id = mb.BUTTON_ID and
+			mb.MENU_ID_ID = rm.MENU_ID and
+			rm.role_id =   #{id, mode=IN, jdbcType=VARCHAR}
+	</select>
+	<select id="getButtonByButton" parameterType="Menu" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.status,
+			b.mark,
+			b.menuId 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb
+		where 
+			b.id = mb.BUTTON_ID and
+			<if test="id != null and id != ''">
+				mb.MENU_ID_ID =  #{id, mode=IN, jdbcType=VARCHAR}
+			</if>
+			
+	</select>
+	<select id="getButtonById" parameterType="String" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.status,
+			b.mark,
+			b.menuId 
+		from AUTH_BUTTON b
+		where 1=1 and
+			b.id =  #{id, mode=IN, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getButtonsByButton" parameterType="Button" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.status,
+			b.mark,
+			b.menuId,
+			m.name menuName 
+		from 
+			AUTH_BUTTON b,
+			AUTH_MENU m
+		where b.menuId(+) = m.id
+			and b.menuid is not null
+		<if test="id != null and id != ''">
+			and b.id = #{id , mode=IN, jdbcType=VARCHAR}
+		</if>
+		<if test="menuId != null and menuId != ''">
+			START　WITH m.id = #{menuId , mode=IN, jdbcType=VARCHAR}
+			 CONNECT BY PRiOR m.id = m.pid 
+		</if>
+			
+	</select>
+	
+</mapper>

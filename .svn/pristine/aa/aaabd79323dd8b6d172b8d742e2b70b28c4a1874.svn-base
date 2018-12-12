@@ -1,0 +1,94 @@
+package com.test;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.alibaba.fastjson.JSON;
+import com.hrxt.App;
+import com.hrxt.pojo.Csjh;
+import com.hrxt.pojo.OilJCJH;
+import com.hrxt.pojo.Page;
+import com.hrxt.service.impl.OilJCJHServiceImpl;
+
+/**
+ * SpringBoot测试类
+ *@RunWith:启动器 
+ *SpringJUnit4ClassRunner.class：让junit与spring环境进行整合
+ *
+ *@SpringBootTest(classes={App.class}) 1,当前类为springBoot的测试类
+ *@SpringBootTest(classes={App.class}) 2,加载SpringBoot启动类。启动springBoot
+ *
+ *junit与spring整合 @Contextconfiguartion("classpath:applicationContext.xml")
+ */
+@RunWith(SpringJUnit4ClassRunner.class) 
+@SpringBootTest(classes={App.class})
+public class OilJCJHServiceTest {
+
+	@Autowired
+	private OilJCJHServiceImpl oilJCJHServiceImpl;
+	
+	@Test
+	public void testGetCsjh(){
+		OilJCJH oilJCJH = new OilJCJH();
+		oilJCJH.setStime("2018-10");
+		Page<List<OilJCJH>> page = new Page<List<OilJCJH>>();
+		Map<String,Object> mp =this.oilJCJHServiceImpl.getOilJCJHList(oilJCJH, page);
+		System.out.println(JSON.toJSONString(mp));
+	}
+	
+	@Test
+	public void testInsertCsjh(){
+		//Csjh csjh1 =  new Csjh("西柳工区","西柳10断块","西柳10-120X","油井");
+		OilJCJH oilJCJH = new OilJCJH();                                  
+		oilJCJH.setCreate_date(null);
+		oilJCJH.setWell_id("HBz6sBUJR1");
+		oilJCJH.setWell_name("高30-41X");
+		oilJCJH.setWell_section("1");
+		oilJCJH.setCs_claim("=================================================");
+		oilJCJH.setCs_explaim("1");
+		
+		oilJCJH.setCs_purpose("1");
+		oilJCJH.setCs_type_id("措施");
+		oilJCJH.setFail_mesg("1");
+		oilJCJH.setLevel_demand(1);
+		oilJCJH.setPlies_num(1);
+		oilJCJH.setRecently_fail_date("2018-11-14");
+		oilJCJH.setFk_cd_date("2018-11-14");
+		oilJCJH.setRecently_revise_mesg("1");
+		oilJCJH.setSite_id("HBE8z9hlXd");
+		oilJCJH.setStime("高阳工区");
+		oilJCJH.setSuccess_date("2018-11-14");
+		oilJCJH.setTc_date("2018-11-14");
+		oilJCJH.setThickness(Double.parseDouble("1"));
+		oilJCJH.setYc_name("高30断块");
+		System.out.println(oilJCJH.getCs_claim());
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println(JSON.toJSONString(oilJCJH));
+		String mp1 = this.oilJCJHServiceImpl.insertOrUpdate(oilJCJH);//insertOrUpdate(csjh1);
+	
+		
+		System.out.println(JSON.toJSONString(mp1));
+	}
+	
+	
+	@Test
+	public void testOilJCJH(){
+		//Csjh csjh1 =  new Csjh("西柳工区","西柳10断块","西柳10-120X","油井");
+		OilJCJH oilJCJH = new OilJCJH();                                  
+	
+		oilJCJH.setCs_claim("cs_claim222222222222");
+		System.out.println(oilJCJH.getCs_claim());
+		System.out.println(JSON.toJSONString(oilJCJH));
+		//String mp1 = this.oilJCJHServiceImpl.insertOrUpdate(oilJCJH);//insertOrUpdate(csjh1);
+	
+		
+		//System.out.println(JSON.toJSONString(mp1));
+	}
+	
+}

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.MenuMapper">
+	
+	<sql id="select_menu_fields" >
+		id,
+		name,
+		urlType,
+		appTpye,
+		hostName,
+		hostPoart,
+		appName,
+		pid,
+		url,
+		status,
+		mark,
+		imgName
+	</sql>
+	<sql id="insert_menu_fields" >
+		#{id, mode=IN, jdbcType=VARCHAR},
+		#{name, mode=IN, jdbcType=VARCHAR},
+		#{urlType, mode=IN, jdbcType=VARCHAR},
+		#{appTpye, mode=IN, jdbcType=VARCHAR},
+		#{hostName, mode=IN, jdbcType=VARCHAR},
+		#{hostPoart, mode=IN, jdbcType=VARCHAR},
+		#{appName, mode=IN, jdbcType=VARCHAR},
+		#{pid, mode=IN, jdbcType=VARCHAR},
+		#{url, mode=IN, jdbcType=VARCHAR},
+		#{status, mode=IN, jdbcType=VARCHAR},
+		#{mark, mode=IN, jdbcType=VARCHAR},
+		#{imgName, mode=IN, jdbcType=VARCHAR}
+	</sql>
+	<sql id="update_menu_fields" >
+		id		=	#{id, mode=IN, jdbcType=VARCHAR},
+		name	=	#{name , mode=IN, jdbcType=VARCHAR},
+		urlType	=	#{urlType , mode=IN, jdbcType=VARCHAR},
+		appTpye=	#{appTpye, mode=IN, jdbcType=VARCHAR},
+		hostName=	#{hostName, mode=IN, jdbcType=VARCHAR},
+		hostPoart=	#{hostPoart, mode=IN, jdbcType=VARCHAR},
+		appName	=	#{appName, mode=IN, jdbcType=VARCHAR},
+		pid		=	#{pid, mode=IN, jdbcType=VARCHAR},
+		url		=	#{url, mode=IN, jdbcType=VARCHAR},
+		status	=	#{status, mode=IN, jdbcType=VARCHAR},
+		mark	=	#{mark, mode=IN, jdbcType=VARCHAR},
+		imgName	=	#{imgName, mode=IN, jdbcType=VARCHAR}
+	</sql>
+	
+	<insert id="insertMenu" parameterType="Menu">
+		insert into 
+		AUTH_MENU(
+			<include refid="select_menu_fields"/>) 
+		values(
+			<include refid="insert_menu_fields"/>)
+	</insert>
+	
+	
+	<delete id="deleteMenuByMenu" parameterType="Menu">
+		delete 
+		from AUTH_MENU 
+		where id = #{id}
+	</delete>
+	<delete id="deleteMenuById" parameterType="String">
+		delete 
+		from AUTH_MENU 
+		where id = #{value}
+	</delete>
+	<delete id="deleteMenuByIds" parameterType="String">
+		delete 
+		from AUTH_MENU 
+		where id in( #{value} ) 
+	</delete>	
+
+
+	<update id="updateMenu" parameterType="Menu">
+		update AUTH_MENU 
+		set 
+			<include refid="update_menu_fields"/>
+			
+		where id=#{id}
+	</update>
+	
+	
+	<select id="getMenus" resultType="Menu">
+		select 
+			<include refid="select_menu_fields"/>
+		from AUTH_MENU
+	</select>
+	<select id="getMenusByUser" parameterType="User" resultType="Menu">
+		select 
+			dinstinct m.id,
+			m.name,
+			m.urlType,
+			m.appTpye,
+			m.hostName,
+			m.hostPoart,
+			m.appName,
+			m.pid,
+			m.url,
+			m.status,
+			m.mark,
+			m.imgName
+		from AUTH_MENU m ,
+			 AUTH_ROLE_MENU rm,
+			 AUTH_USER_ROLE ur
+		where 
+			m.id = rm.menu_id 
+			and rm.role_id = ur.role_id
+			and ur.user_id =  #{id}
+	</select>
+	
+	<select id="getMenusByRole" parameterType="Role" resultType="Menu">
+		select 
+			m.id,
+			m.name,
+			m.urlType,
+			m.appTpye,
+			m.hostName,
+			m.hostPoart,
+			m.appName,
+			m.pid,
+			m.url,
+			m.status,
+			m.mark,
+			m.imgName
+		from AUTH_MENU m ,
+			 AUTH_ROLE_MENU rm,
+		where 
+			m.id = rm.menu_id 
+			and rm.role_id =  #{id}
+	</select>
+	<select id="getMenusByButton" parameterType="Menu" resultType="Menu">
+		select 
+			<include refid="select_menu_fields"/> 
+		from AUTH_MENU m
+		where m.id = #{id}
+	</select>
+	<select id="getMenuByMenu" parameterType="String" resultType="Menu">
+		select 
+			<include refid="select_menu_fields"/> 
+		from AUTH_MENU m
+		where 1=1 
+		START　WITH
+		<if test="id == null or id == ''">
+			 m.id is Null
+		</if>
+		<if test=" id != '' and id != ''">
+			 m.id = #{id}
+		</if> 
+    		CONNECT BY PRiOR m.id = m.pid 
+	</select>
+	
+
+
+</mapper>

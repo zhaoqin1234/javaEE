@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.WellMapper">
+
+	<!-- index  -->
+	<resultMap id="p_DZS_GQ_DK_DJ_Mp" type="com.hrxt.pojo.Well">
+		<result property="wellId" 			jdbcType="VARCHAR" column="WELL_ID"/>
+		<result property="wellCommonName" 	jdbcType="VARCHAR" column="WELL_COMMON_NAME"/>
+		<result property="siteId"        	jdbcType="VARCHAR" column="SITE_ID"/>
+		<result property="siteName" 		jdbcType="VARCHAR" column="SITE_NAME"/>
+		<result property="orgId" 			jdbcType="VARCHAR" column="ORG_ID"/>
+		<result property="orgName" 			jdbcType="VARCHAR" column="ORG_NAME"/>
+	</resultMap>
+	<!--   —-->
+	<select id="P_DZS_GQ_DK_DJ_N" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_ZDWH.P_DZS_GQ_DK_DJ_N(
+		  			#{i_org_id, mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id,mode=IN, jdbcType=VARCHAR},
+		  			#{i_well, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_cnt, 	mode=OUT, jdbcType=DECIMAL},
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=p_DZS_GQ_DK_DJ_Mp}
+		          )
+	    ]]>
+	</select>
+	<!-- 带分页  -->
+	<select id="P_DZS_GQ_DK_DJ" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL PKG_ZDWH.P_DZS_GQ_DK_DJ(
+		  			#{i_org_id, mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id,mode=IN, jdbcType=VARCHAR},
+		  			#{i_well, 	mode=IN, jdbcType=VARCHAR},
+		  			#{o_cnt, 	mode=OUT, jdbcType=DECIMAL},
+		  			#{i_p_index,mode=IN, jdbcType=VARCHAR},
+		  			#{i_p_size, mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, mode=OUT,jdbcType=CURSOR, resultMap=p_DZS_GQ_DK_DJ_Mp}
+		          )
+	    ]]>
+	</select>
+
+	
+	
+</mapper>

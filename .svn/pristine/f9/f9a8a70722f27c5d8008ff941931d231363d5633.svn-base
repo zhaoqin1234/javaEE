@@ -1,0 +1,50 @@
+#jsp 
+spring.mvc.view.prefix=/WEB-INF/jsp/
+spring.mvc.view.suffix=.jsp
+
+
+server.context-path=/DZSBB
+
+#jsp change don't restApp.java     tomcat must set false
+server.jsp-servlet.init-parameters.development=true
+# open devtools enable 
+spring.devtools.restart.enabled: true
+
+# autu bushu mulu
+spring.devtools.restart.additional-paths: src/main/java
+
+# don't  bu shu mulu
+spring.devtools.restart.exclude: test/**
+
+#mybits sanaliases  
+mybatis.type-aliases-package=com.hrxt.pojo
+# must set folder :spring boot package con't package classpath:com.XXX.mapeer.xml
+mybatis.mapperLocations=classpath:mybatis/mapper/*/*.xml
+
+
+# database connect infomation
+spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
+spring.datasource.url=jdbc:oracle:thin:@192.168.2.220:1521:orcl
+spring.datasource.username=dzsbb
+spring.datasource.password=dzsbb
+spring.datasource.driverClassName=oracle.jdbc.driver.OracleDriver
+ 
+ 
+# 
+spring.datasource.initialSize=5
+spring.datasource.minIdle=5
+spring.datasource.maxActive=20
+# 
+spring.datasource.maxWait=60000
+# 
+spring.datasource.timeBetweenEvictionRunsMillis=60000
+# 
+spring.datasource.minEvictableIdleTimeMillis=300000
+spring.datasource.validationQuery=SELECT 1 FROM DUAL
+spring.datasource.testWhileIdle=true
+spring.datasource.testOnBorrow=false
+spring.datasource.testOnReturn=false
+# 
+spring.datasource.filters=stat,wall,log4j
+spring.datasource.logSlowSql=true
+

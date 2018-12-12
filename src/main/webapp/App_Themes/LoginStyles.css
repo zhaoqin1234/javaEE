@@ -1,0 +1,165 @@
+﻿*{
+	padding:0px;
+	margin:0px;
+	list-style-type:none;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#5B5B5B;
+	}
+body{
+	background:url(../images/login/main_bg.jpg) repeat-x;
+	}
+td{
+	text-align:left;
+	}
+.center{
+	width:1003px;
+	overflow:hidden;
+	margin:auto;
+	}
+.white a:link, .white a:visited{
+	color:#FFFFFF;
+	text-decoration:underline;
+	}
+.white a:hover{
+	color:#D4FEFF;
+	text-decoration:underline;
+	}
+.white a{
+	margin-left:15px;
+	}
+.loginForm{
+	width:200px;
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left:3px;
+	border:#83A0B7 solid 1px;
+	background-color:#E0F4FF;
+	font-weight:bold;
+	color:#292929;
+	font-size:14px;
+	margin-bottom:10px;
+	font-family:Verdana;
+	}
+.loginForm1{
+	width:200px;
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left:3px;	
+	border:#83A0B7 solid 1px;
+	background-color:#CBF4FF;
+	font-weight:bold;
+	color:#292929;
+	font-size:14px;
+	margin-bottom:10px;
+	font-family:Verdana;
+	}
+.loginBt1{
+	width:86px;
+	height:34px;
+	background:url(../images/login/ico.gif) 0px -50px no-repeat;
+	border:0px;
+	cursor:pointer;
+	}
+.loginBt{
+	width:86px;
+	height:34px;
+	background:url(../images/login/ico.gif) 0px 0px no-repeat;
+	border:0px;
+	cursor:pointer;
+	}
+.loginLook1{
+	width:86px;
+	height:34px;
+	background:url(../images/login/ico.gif) -150px -50px no-repeat;
+	border:0px;
+	cursor:pointer;
+	}
+.loginLook{
+	width:86px;
+	height:34px;
+	background:url(../images/login/ico.gif) -150px 0px no-repeat;
+	border:0px;
+	cursor:pointer;
+	}
+#sta_1{
+	width:48px;
+	height:48px;
+	background:url(../images/login/ico.gif) 0px -100px no-repeat;
+	}
+#sta_2{
+	width:48px;
+	height:48px;
+	background:url(../images/login/ico.gif) 0px -200px no-repeat;
+	}
+#sta_3{
+	width:48px;
+	height:48px;
+	background:url(../images/login/ico.gif) 0px -300px no-repeat;
+	}
+#sta_4{
+	width:48px;
+	height:48px;
+	background:url(../images/login/ico.gif) 0px -400px no-repeat;
+	}
+.Go img{
+	margin-top:20px;
+	}
+.yellow a:link, .yellow a:visited{
+	color:#FF6600;
+	text-decoration:underline;
+	}
+.yellow a:hover{
+	color:#FF3000;
+	text-decoration:underline;
+	}
+.BlueFont a:link, .BlueFont a:visited{
+	text-decoration:underline;
+	}
+.BlueFont a:hover{
+	color:#0072AC;
+	text-decoration:underline;
+	}
+.BrandFont p{
+	color:#107DB4;
+	font-size:14px;
+	font-weight:bold;
+	line-height:23px;
+	}
+.BrandFont span{
+	line-height:16px;
+	color:#A0A0A0;
+	width:98px;
+	}
+.Bottom{
+	line-height:22px;
+	color:#666667;
+	}
+.Bottom strong{
+	font-size:11px;
+	}
+.BottomMail span{
+	font-size:11px;
+	color:#5188B7;
+	text-decoration:underline;
+	}
+.BottomMail a:link, .BottomMail a:visited{
+	color:#5188B7;
+	font-size:11px;
+	text-decoration:underline;
+	}
+.BottomMail a:hover{
+	color:#0072AC;
+	text-decoration:underline;
+	}
+.BottomGreen a:link, .BottomGreen a:visited{
+	color:#2C9C61;
+	text-decoration:underline;
+	}
+.BottomGreen a:hover{
+	color:#047539;
+	text-decoration:underline;
+	}
+.BottomHeight{
+	height:35px;
+	}

@@ -1,0 +1,29 @@
+package com.hrxt.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class IndexController {
+
+	//测试
+	@RequestMapping("/index")
+	public String indexJsp(){
+		return "index";
+	}
+	
+	
+	//测试
+		@RequestMapping("/index2")
+		public String indexJsp2(){
+			return "index2";
+		}
+	
+		@RequestMapping("/root/{page}")
+		public String showPage3(@PathVariable String page){
+			return  page;
+		}
+
+	
+}

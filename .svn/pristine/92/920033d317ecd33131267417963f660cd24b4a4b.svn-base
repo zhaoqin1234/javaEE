@@ -1,0 +1,66 @@
+package com.hrxt.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.hrxt.pojo.MonthPZ;
+
+public interface MonthPZMapper {
+	
+	/**
+	 * 获取月配注信息
+	 * @param param
+	 * @return
+	 */
+	String p_dzs_get_ypzbb(Map<String, Object> param);
+	
+	/**
+	 * 获取配注的报表模板
+	 * @param param
+	 * @return
+	 */
+	String p_dzs_get_ypzbb_mb(Map<String, Object> param);
+	
+	/**
+	 * 月配注 报表    insert  or update
+	 * @param param
+	 * @return
+	 */
+	String p_DZS_INSERT_UP_YPZBB(Map<String, Object> param);
+	
+	/**
+	 * 月配注   excel新增
+	 * @param param
+	 * @return
+	 */
+	String p_DZS_INSERT_UP_YPZBB_EXCEL(Map<String, Object> param);
+	/**
+	 * 删除一条记录
+	 * @param param
+	 * @return
+	 */
+	Integer p_DZS_DEL_YPZBB(Map<String, Object> param);
+	
+	/**
+	 * 提交记录为审核状态
+	 * @param sqp
+	 * @return
+	 */
+	int auditOneYPZBB(String sqp);
+	
+	int unAuditOneYPZBB(String sqp);
+	/**
+	 * 记录的提交
+	 * @param seq
+	 * @return
+	 */
+	int submitMonthPZ(String seq);
+	
+	int unSubmitMonthPZ(String seq);
+	
+	/**
+	 * 根据工区和时间查询配注报表
+	 */
+	String  P_GET_YPZBB_REPORT(Map<String, Object> param);
+	
+}

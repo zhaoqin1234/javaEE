@@ -1,0 +1,31 @@
+package com.hrxt.mapper;
+
+import java.util.Map;
+/**
+ * 获取 心井生产运行科  信息
+ * @author ZhaoQin
+ *
+ */
+public interface XjscyxkMapper {
+	
+	/**
+	 *查询  
+	 */
+	String p_dzs_get_xjscyxk(Map<String, Object> param);
+	
+	
+	/**
+	 * 新增或者更新
+	 */
+	String p_dzs_insert_up_xjscyxk(Map<String, Object> param);
+	
+	
+	/**
+	 * 删除
+	 * @param param
+	 * @return
+	 */
+	Integer p_dzs_del_xjscyxk(Map<String, Object> param);
+	
+	
+}

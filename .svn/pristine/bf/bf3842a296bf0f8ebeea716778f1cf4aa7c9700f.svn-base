@@ -1,0 +1,345 @@
+package com.hrxt.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.alibaba.fastjson.JSON;
+import com.hrxt.pojo.MonthPZ;
+import com.hrxt.pojo.Page;
+import com.hrxt.pojo.Xjscyxk;
+import com.hrxt.service.MonthPZService;
+import com.hrxt.service.WellService;
+import com.hrxt.utils.ExcelUtil;
+import com.hrxt.utils.JSONutils;
+
+
+@Controller
+@RequestMapping("/monthPZ")
+public class MonthPZController {
+
+	@Autowired
+	private MonthPZService monthPZService;
+	
+	@Autowired
+	private WellService wellService;
+	
+	
+	@RequestMapping("/insert")
+	@ResponseBody
+	public String insetMonthPZ(MonthPZ monthPZ){	
+		return this.monthPZService.insertOrUpdate(monthPZ);
+	}
+	
+	
+	@RequestMapping("/insertList")
+	@ResponseBody
+	public String insetMonthPZList( MonthPZ monthPZ){	
+		System.out.println(JSONutils.Object2String(monthPZ));
+		List<MonthPZ> list11 = new ArrayList<MonthPZ>();
+		list11.add(monthPZ);
+		List<String> list = monthPZService.batchInsertOrUpdate(list11);
+		return JSON.toJSONString(list);
+	}
+	
+	
+	@RequestMapping("/delOneMonthPZ")
+	@ResponseBody
+	public String delOneMonthPZ(String seq){	
+		  return monthPZService.delOneYPZBB(seq);
+	}
+
+	
+	@RequestMapping("/delMonthPZList")
+	@ResponseBody
+	public String delMonthPZList(String seqlist){	
+		return monthPZService.delListYPZBB(seqlist);
+	}
+	
+	/**
+	 * monthPZ记录审核  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/auditMonthP")
+	@ResponseBody
+	public String auditMonthPZ(String seqlist){	
+		return monthPZService.auditOneYPZBB(seqlist);
+	}
+	
+	@RequestMapping("/unAuditMonthP")
+	@ResponseBody
+	public String unAuditMonthPZ(String seqlist){	
+		return monthPZService.unAuditOneYPZBB(seqlist);
+	}
+	/**
+	 * monthPZ【提交】  方法
+	 * @param seqlist
+	 * @return
+	 */
+	@RequestMapping("/submittMonthP")
+	@ResponseBody
+	public String submitMonthPZ(String seqlist){	
+		return monthPZService.submitMonthPZ(seqlist);
+	}
+	@RequestMapping("/unSubmittMonthP")
+	@ResponseBody
+	public String unSubmitMonthPZ(String seqlist){	
+		return monthPZService.unSubmitMonthPZ(seqlist);
+	}
+	
+	
+	/**
+	 * 获取配注信息  通过分页
+	 * @param monthPZ
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping("/getMonthPZList")
+	@ResponseBody
+	public String getMonthPZList(MonthPZ monthPZ,Page<List<MonthPZ>> page){	
+		return JSON.toJSONString(monthPZService.getMonthPZList(monthPZ, page));
+	}
+	
+	
+	//    /monthPZ/getMonthPZListjson
+	@RequestMapping("/getMonthPZListjson")
+	@ResponseBody
+	public String getMonthPZListfastJSON(MonthPZ monthPZ,Page<List<MonthPZ>> page){	
+		;
+		return JSON.toJSONString(monthPZService.getMonthPZList(monthPZ, page));
+	}
+	
+	
+	
+	/**  /monthPZ/dwnloadTmp
+	 * 下载导入模板        下面的过滤条件  必须填
+	 * 	"site_id", 
+		"yc_id",
+		"stime", 
+		"well_id", 
+	 */
+	@RequestMapping("/dwnloadTmp")
+	public void dwnloadTmpMB(MonthPZ monthPZ,HttpServletResponse response,String fileName){
+		
+		//获取配注的计划信息
+		List<MonthPZ> monthPZlist = this.monthPZService.getMonthPZMB(monthPZ);
+		
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "月配注模板导出";//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注","时间","备注"};
+        
+        //设置列宽
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        
+        //在excel表中添加表头
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (MonthPZ welltmp : monthPZlist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(welltmp.getSite_name());
+            row1.createCell(1).setCellValue(welltmp.getYc_name());
+            row1.createCell(2).setCellValue(welltmp.getWell_name());
+            if(welltmp.getDzpz() != null) {
+            	row1.createCell(3).setCellValue(welltmp.getDzpz());
+            }
+            if(welltmp.getKhpz() != null) {
+            	row1.createCell(4).setCellValue(welltmp.getKhpz());
+            }
+            if(welltmp.getStime() != null) {
+            	row1.createCell(5).setCellValue(welltmp.getStime());
+            }
+            if(welltmp.getMark() != null) {
+            	row1.createCell(6).setCellValue(welltmp.getMark());
+            }
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try {
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	
+	@RequestMapping("/dwnloadQueryData")
+	public void dwnloadQueryData(MonthPZ monthPZ,Page<List<MonthPZ>> page,HttpServletResponse response,String fileName){
+		
+		//获取配注的计划信息
+		Map<String,Object> map = this.monthPZService.getMonthPZList(monthPZ, page);
+		List<MonthPZ> datalist = (List<MonthPZ>)map.get("data"); 
+		
+		HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("信息表");
+
+        if(fileName ==  null) {
+        	fileName = "月配注模板导出" ;//设置要导出的文件的名字
+        }
+        
+        //新增数据行，并且设置单元格数据
+        int rowNum = 1;
+
+        String[] headers = { "工区", "断块", "井名", "地质配注","考核配注","时间","备注"};
+        
+        //设置列宽
+        sheet.setColumnWidth(0, 35*150);
+        sheet.setColumnWidth(1, 35*150);
+        sheet.setColumnWidth(2, 35*150);
+        sheet.setColumnWidth(3, 35*150);
+        sheet.setColumnWidth(4, 35*150);
+        sheet.setColumnWidth(5, 35*150);
+        //headers表示excel表中第一行的表头
+
+        HSSFRow row = sheet.createRow(0);
+        
+        //在excel表中添加表头
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell = row.createCell(i);
+            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+            cell.setCellValue(text);
+            
+        }
+
+        //在表中存放查询到的数据放入对应的列
+        for (MonthPZ welltmp : datalist) {
+            HSSFRow row1 = sheet.createRow(rowNum);
+            row1.createCell(0).setCellValue(welltmp.getSite_name());
+            row1.createCell(1).setCellValue(welltmp.getYc_name());
+            row1.createCell(2).setCellValue(welltmp.getWell_name());
+            if(welltmp.getDzpz() != null) {
+            	row1.createCell(3).setCellValue(welltmp.getDzpz());
+            }
+            if(welltmp.getKhpz() != null) {
+            	row1.createCell(4).setCellValue(welltmp.getKhpz());
+            }
+            if(welltmp.getStime() != null) {
+            	row1.createCell(5).setCellValue(welltmp.getStime());
+            }
+            if(welltmp.getMark() != null) {
+            	row1.createCell(6).setCellValue(welltmp.getMark());
+            }
+            rowNum++;
+        }
+
+        response.setContentType("application/octet-stream");
+        String newFileName = "";
+		try {
+			newFileName = new String(fileName.getBytes("gb2312"), "ISO8859-1");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        response.setHeader("Content-disposition", "attachment;filename=" + newFileName+ ".xls");
+        try {
+			response.flushBuffer();
+			workbook.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+	}
+	
+	
+	//excel批量上传数据     /monthPZ/excelUpdateMonthPZ
+	/**
+	 * @param monthPZ
+	 * @param fileMult
+	 * @param fileName
+	 * @return
+	 */
+	@RequestMapping("/excelUpdateMonthPZ")
+	public String updateMonthPZList(MultipartFile fileMult,String fileName){	
+		List<Map<String, Object>> list = null;
+		if(fileMult==null) {
+			//System.out.println("没有数据流");
+			return "没有数据流";
+		}
+		try {
+			String name =  fileMult.getOriginalFilename();
+			InputStream is = fileMult.getInputStream();
+			//System.out.println(name+is);
+			String [] fileds = {"site_name","yc_name","well_name","dzpz","khpz","stime","mark"};
+			if(is != null) {
+				list = ExcelUtil.getDataListByexcel(0, 1, is, name, fileds);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			MonthPZ monthPz = new MonthPZ();
+			monthPz.setSite_name((String)map.get("site_name"));
+			monthPz.setYc_name((String)map.get("yc_name"));
+			monthPz.setDzpz((Integer.parseInt((String) map.get("dzpz"))));
+			monthPz.setWell_name((String)map.get("well_name"));
+			monthPz.setStime((String)map.get("stime"));
+			monthPz.setMark((String)map.get("mark"));
+			//System.out.println(JSONutils.Object2String(map));
+			monthPZService.insertOrUpdate(monthPz);
+		}
+		
+		return "";
+	}
+	
+	
+	
+	
+	
+   
+   
+   
+	
+	
+}

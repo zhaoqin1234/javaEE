@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>新井生产运行科</title>
+</head>
+<body>
+	<div id="div1">
+		<div class="mini-toolbar" id="toolbar1">
+			<span>工区:</span>
+           	<input id="site_id" class="mini-combobox" textField="name" valueField="id" showClose="true" onvaluechanged="getWellList"
+				style="width:120px;" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"
+				url="<%=basePath%>org/getAllOrg" />
+			<span>井号:</span>
+			<input id="well_id" class="mini-combobox" textField="wellCommonName" valueField="wellId" showClose="true"
+				style="width:120px;" allowinput="true" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"/>
+			<span>井别:</span>
+			<input id="well_type" class="mini-combobox"  showClose="true" url="<%=basePath%>/data/wellType.txt" 
+				style="width:80px;" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"/>
+			<span>日期:</span>
+			<input name="time" type="text" id="time" style="width:120px;" class="mini-monthpicker" format="yyyy-MM" allowinput="true"/>
+			<span>状态:</span>
+			<input id="state_id" class="mini-combobox" showClose="true" url="<%=basePath%>/data/state.txt" 
+				style="width:80px;" shownullitem="false" emptyText="请选择..." oncloseclick="onCloseClick"/>
+			<a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+			<a class="mini-button" iconCls="icon-download" onclick="exportData()">导出</a>
+			<a class="mini-button" iconCls="icon-ok" onclick="submitData()">批量提交</a>
+			<div style="float:right">
+		        <a class="mini-button" iconCls="icon-add" onclick="add()">新增</a>
+		        <a class="mini-button" iconCls="icon-edit" onclick="edit()">编辑</a>
+		        <a class="mini-button" iconCls="icon-remove" onclick="remove()">删除</a>
+		        <a class="mini-button" iconCls="icon-upload" onclick="openUploadFileDialog()">批量导入</a>
+        	</div>
+		</div>
+		<div id="datagrid" class="mini-datagrid" style="width:100%;height:100%;" url="<%=basePath%>xjscyxk/getXjscyxkList" sizeList="[10,20,30,40,50,100,200,500,1000]"
+			idField="id" allowResize="true" sortMode="client" multiSelect="true" showReloadButton="false" pageSize="20" showPager="true" allowUnselect="true" >
+			<div property="columns">
+				<div type="checkcolumn" ></div>
+				<div type="indexcolumn" width="50" headeralign="center" headerstyle="font-weight: bold;">序号</div>
+          		<div field="site_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">工区</div>
+          		<div field="yc_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">油藏</div>
+          		<div field="well_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">井号</div>
+          		<div field="well_type_name" headerAlign="center" align="center" headerStyle="font-weight: bold;">井别</div>
+          		<div field="prod_plan_day" headerAlign="center" align="center" headerStyle="font-weight: bold;">预计日产油<br />（t）</div>
+          		<div field="condition" headerAlign="center" align="center" headerStyle="font-weight: bold;">目前工况</div>
+          		<div field="tj_status" headerAlign="center" align="center" headerStyle="font-weight: bold;">提交状态</div>
+          		<div field="sh_status" headerAlign="center" align="center" headerStyle="font-weight: bold;">审核状态</div>
+          		<div field="stime" headerAlign="center" align="center" headerStyle="font-weight: bold;">数据日期</div>
+          		<div field="mark" headerAlign="center" align="center" headerStyle="font-weight: bold;">备注</div>
+            </div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var HeightEx = document.documentElement.clientHeight;
+	document.getElementById("div1").style.height = HeightEx - 50 + "px";
+	var time,title,site_id,well_id,state_id,well_type;
+	time = getTodayMonth();
+	mini.parse();
+	mini.get("time").setValue(time);
+	var grid = mini.get("datagrid");
+	var siteObj = mini.get("site_id");   //工区
+	var wellObj = mini.get("well_id");   //井号
+//	grid.frozenColumns(0,4);
+//	getSiteList();
+	search();
+<%-- 	function getSiteList(){
+		var url = "<%=basePath%>org/getAllOrg";
+		siteObj.setUrl(url);
+	} --%>
+	function getWellList(){
+		site_id = siteObj.getValue();
+		var url ="<%=basePath%>well/getWellMsg?orgId=" + site_id;
+		wellObj.setUrl(url);
+	}
+	function search(){
+		site_id = siteObj.getValue();
+		well_id = wellObj.getValue();
+		state_id = mini.get("state_id").getValue();
+		well_type = mini.get("well_type").getValue();
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("日期不能为空");
+			return;
+		}
+		grid.load({site_id:site_id,well_id:well_id,well_type:well_type,stime:time,tj_status:state_id});
+	}
+	function submitData(){
+		var rows = grid.getSelecteds();
+		if(rows.length > 0){
+			var ids = [];
+			$.each(rows,function(index,i){
+				if(i.tj_status == "未提交"){
+					ids.push("\'" + i.seq + "\'");
+				}
+	        });
+			var seqlist = ids.join(",");
+			if(seqlist.length > 0){
+				$.ajax({
+	                url: "<%=basePath%>xjscyxk/",
+	                contentType: 'application/json',
+	                dataType:'text',
+	                data: {
+	                	seqlist: seqlist
+	                },
+	                success: function (text) {
+	              	  search();
+	                }
+	            });
+			}else{
+				mini.alert("请选择未提交的数据");
+			}
+		}else{
+			mini.alert("请至少选择一条数据");
+		}
+	}
+	function add(){
+		mini.open({
+            url: "<%=basePath%>measure/newWellProductionEdit",
+            title: "新增新井生产运行科数据", 
+            width: 550, 
+            height: 350,
+            onload: function () {
+                var iframe = this.getIFrameEl();
+                var data = {action: "new"};
+                iframe.contentWindow.SetData(data);
+            },
+            ondestroy: function (action) {
+          		search();
+            }
+        });
+	}
+	function edit(){
+		var rows = grid.getSelecteds();
+		if(rows.length > 0){
+			if(rows[0].tj_status == "未提交"){
+				mini.open({
+	                url:"<%=basePath%>measure/newWellProductionEdit",
+	                title: "编辑新井生产运行科数据", 
+	                width: 550, 
+	                height: 350,
+	                onload: function () {
+	                    var iframe = this.getIFrameEl();
+	                    var data = { action: "edit", row: rows[0]};
+	                    iframe.contentWindow.SetData(data);
+	                },
+	                ondestroy: function (action) {
+	                	search();
+	                }
+	            });
+			}else{
+				mini.alert("已提交的数据不可修改");
+			}
+		}else{
+			mini.alert("请选中一条记录");
+		}
+	}
+	function remove(){
+		var rows = grid.getSelecteds();
+		if (rows.length > 0){
+			var ids = [];
+	    	$.each(rows,function(index,i){
+	    		if(i.tj_status == "未提交"){
+	    			ids.push("\'" + i.seq + "\'");
+	    		}
+	        });
+	    	var seqlist = ids.join(",");
+	    	if(seqlist.length > 0){
+	    		if (confirm("确定删除选中记录？")){
+					$.ajax({
+	                    url: "<%=basePath%>xjscyxk/delXjscyxkList",
+	                    dataType:'text',
+	                    data: {
+	                    	seqlist: seqlist
+	                    },
+	                    success: function (text) {
+	                  		search();
+	                    }
+	                });
+				}
+	    	}else{
+	    		mini.alert("已提交的数据不可删除");
+	    	}
+		}else{
+			mini.alert("请选中一条记录");
+		}
+	}
+	function openUploadFileDialog(){
+		mini.open({
+            url:"<%=basePath%>measure/newWellProductionExport",
+            title: "新井生产运行科数据批量导入", 
+            width: 550, 
+            height: 380,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            	search();
+            }
+        });
+	}
+	
+	function exportData(){
+		time = mini.get("time").getFormValue();
+		if(time == ""){
+			mini.alert("日期不能为空");
+			return;
+		}
+		org_id = orgObj.getValue();
+		site_id = siteObj.getValue();
+		state_id = stateObj.getValue();
+		title = time.replace("-","年") + "月配注数据审核";
+		var url='<%=basePath%>monthPZ/dwnloadQueryData?stime='+time+'&sh_starts='+state_id+'&fileName='+title+'&orgId='+org_id+'&siteId='+site_id+'&tj_starts=1';
+		window.location.href =encodeURI(url);
+	}
+	
+</script>
+</html>

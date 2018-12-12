@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<jsp:include page="../../../Inc.jsp"></jsp:include>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<html>
+<head>
+<title>措施计划报表</title>
+</head>
+<body>
+	<div id="div1">
+		<div class="mini-toolbar" id="toolbar1">
+			<span>工区:</span>
+			<div id="site_id" class="mini-combobox" style="width:130px;"  textField="site_name" valueField="site_id" value=""
+			    url="<%=basePath%>org/getPublicSite" multiSelect="true"  showClose="true" oncloseclick="onCloseClick" >     
+			    <div property="columns">
+			        <div header="全选" field="site_name"></div>
+			    </div>
+			</div>
+				
+				<span class="separator"></span> 
+			<span>日期:</span>
+			<input name="date" type="text" id="date" style="width:120px;" class="mini-monthpicker" format="yyyy-MM" allowinput="false" emptyText="请选择..." showClose="true" oncloseclick="onCloseClick" />
+			<span class="separator"></span> 
+			<span>类型:</span>
+			<div id="csjh_type" class="mini-combobox" style="width:130px;"  textField="text" valueField="id" value="0"
+			    url="<%=basePath%>data/csjhType.txt" multiSelect="false"  showClose="true"  >     
+			    
+			</div>
+				<span class="separator"></span>
+			<a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+			<span class="separator"></span> 
+			<a class="mini-button" iconCls="icon-download" onclick="BBdownload()">导出报表</a>
+		</div>
+		
+		<div class="mini-toolbar" id="toolbar1" headerAlign="center">
+			<span align="center"><h2 id="bbName">监测计划报表</h2></span>
+		</div>
+		<div id="YourGridId" class="mini-datagrid" style="height: 100%; width: 100%;"></div>
+		
+	</div>
+</body>
+<script type="text/javascript">
+	var HeightEx = document.documentElement.clientHeight;
+	document.getElementById("div1").style.height = HeightEx - 100 + "px";
+	var time,title,site_id,well_step_id,state_id,well_type,data_type;
+	time = getTodayMonth();
+
+	
+	$(function() {
+	        mini.parse();
+	        //InitMedcondGrid(); 
+	        
+	        var dateStr = getTodayByUpMonth();
+	        mini.get("date").setValue(dateStr);
+	        var csjhType = mini.get("csjh_type").value;
+	        var csjhTypeText = mini.get("csjh_type").text;
+	        var site_id = mini.get("site_id").value;
+	        var bbName = dateStr+csjhTypeText+"措施计划表";
+	    	$.ajax({
+	            url: "<%=basePath%>/csjh/CSJHReportData",
+	            dataType:'text',
+	            async: false,
+	            data: {
+	           	 cs_type:csjhType,stime:dateStr,bbName:bbName
+	            },
+	            success: function (text) {
+	          		DrugDataGridIntAnto(text);
+	            }
+	        });
+	    });
+	
+
+
+	
+function DrugDataGridIntAnto (data) {
+		mini.parse();
+		
+		var titleTmp = new Array();
+		if(data != null ){
+			var data = $.parseJSON(data);
+			console.log(mini.get("bbName"));
+			$("#bbName").text(data.bbName); 
+			var objtmp = new Object();
+			objtmp.type = "indexcolumn";
+			objtmp.header = "序号";
+			titleTmp.push(objtmp);
+			$.each(data.title,function(i,n){
+				var objtmp = new Object();
+				objtmp.width = 100;
+				objtmp.headerAlign = "center";
+				objtmp.header = n.title;
+				objtmp.field = n.name;
+				var Tmp2 = new Array();
+				
+				if(n.name_sub1 != null){
+					var objtmp2 = new Object();
+					objtmp2.header = n.title_sub1;
+					objtmp2.field = n.name_sub1;
+					objtmp2.width = 120;
+					objtmp2.headerAlign = "center";
+					Tmp2.push(objtmp2);
+					
+					var objtmp3 = new Object();
+					objtmp3.header = n.title_sub2;
+					objtmp3.field = n.name_sub2;
+					objtmp3.width = 50;
+					objtmp3.headerAlign = "center";
+					Tmp2.push(objtmp3);
+					objtmp.columns = Tmp2 ;
+				}
+				
+				titleTmp.push(objtmp);
+			})
+		}
+		
+		
+	    var grid = mini.get("YourGridId");
+	    var YourUrl = "<%=basePath%>button/getButtonsByButton";
+	    grid.set({
+	        url: YourUrl,
+	        sizeList: [50,100],
+	        pageSize: 50,
+	        columns: titleTmp,
+	        allowAlternating: true, //显示间行色
+	        multiSelect: true,
+	        fitColumns: false, //使用过滤行必须设定这个全充满，否则会有列对齐问题。
+	        allowCellEdit: true,
+	        allowCellSelect: true, 
+	        showFilterRow: false,
+	        showModified: false,
+	        allowCellWrap:true,
+	        allowMoveColumn: false});
+	    
+	    grid.setData(data.data); 
+	}
+	
+	///初始化列表内容
+	function InitMedcondGrid  () {
+	    var grid = mini.get("YourGridId");
+	    DrugDataGridIntAnto();
+	   // grid.load();
+	    
+	}
+	//查询
+	function BBdownload(){
+		var date = mini.get("date").text;
+		var csjh_type = mini.get("csjh_type").value;
+		var csjh_typeText = mini.get("csjh_type").text;
+		var site_id = mini.get("site_id").value;
+		var bbName = date+csjh_typeText+"措施计划表";
+		var urladdress = "<%=basePath%>csjh/dwnloadCSJHReport"
+		var urlcont=urladdress+'?stime='+date+'&cs_type='+csjh_type+'&fileName='+bbName+'&site_ids='+site_id;
+		window.location.href =encodeURI(urlcont);
+		
+	}
+	function search(){
+		var date = mini.get("date").text;
+		var csjh_type = mini.get("csjh_type").value;
+		var csjh_typeText = mini.get("csjh_type").text;
+		var site_id = mini.get("site_id").value;
+		var bbName = date+csjh_typeText+"措施计划表";
+		$.ajax({
+            url: "<%=basePath%>/csjh/CSJHReportData",
+            dataType:'text',
+            async: false,
+            data: {
+           	 cs_type:csjh_type,stime:date,site_ids:site_id,bbName:bbName
+            },
+            success: function (text) {
+          		DrugDataGridIntAnto(text);
+            }
+        });
+	}
+	
+	
+</script>
+</html>

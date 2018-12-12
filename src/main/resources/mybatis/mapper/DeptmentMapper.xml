@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.DeptmentMapper">
+
+	<insert id="insertDeptment" parameterType="Deptment">
+		insert into AUTH_DEPTMENT(
+			id,
+			name,
+			image_name,
+			pid,
+			status,
+			mark) 
+		values(
+			#{id, mode=IN, jdbcType=VARCHAR},
+			#{name, mode=IN, jdbcType=VARCHAR},
+			#{image_name, mode=IN, jdbcType=VARCHAR},
+			#{pid, mode=IN, jdbcType=VARCHAR},
+			#{status, mode=IN, jdbcType=VARCHAR},
+			#{mark, mode=IN, jdbcType=VARCHAR})
+	</insert>
+
+	
+	<delete id="deleteDeptmentByDeptment">
+		delete from AUTH_DEPTMENT 
+		where id = #{id}
+	</delete>
+	<delete id="deleteDeptmentById">
+		delete from AUTH_DEPTMENT 
+		where id = #{value}
+	</delete>
+	<delete id="deleteDeptmentByIds">
+		delete from AUTH_DEPTMENT 
+		where id in ${value}
+	</delete>	
+
+
+	<update id="updateDeptment" parameterType="Deptment">
+		update AUTH_DEPTMENT 
+		set
+			<if test="id != null">id=#{id, mode=IN, jdbcType=VARCHAR},</if>
+			<if test="image_name != null">image_name=#{image_name, mode=IN, jdbcType=VARCHAR},</if>
+			<if test="pid != null">pid=#{pid, mode=IN, jdbcType=VARCHAR},</if>
+			<if test="status != null">status=#{status, mode=IN, jdbcType=VARCHAR},</if>
+			<if test="mark != null">mark=#{mark, mode=IN, jdbcType=VARCHAR},</if>
+			<if test="name != null">name=#{name, mode=IN, jdbcType=VARCHAR}</if>
+			
+		where 
+			id = #{id}
+	</update>
+	
+	
+	<select id="getDeptments" resultType="Deptment">
+		select 
+			id,name,image_name,pid,suatus,mark
+		from AUTH_DEPTMENT
+	</select>
+	<select id="getDeptmentsByUser" parameterType="User" resultType="Deptment">
+		select 
+			d.id,
+			d.name,
+			d.image_name,
+			d.pid,
+			d.status,
+			d.mark 
+		from AUTH_DEPTMENT d,
+			 AUTH_USER u,
+		where 
+			d.id = u.DEPTMENTID and
+			u.ID =  #{id}
+	</select>
+	<select id="getDeptmentsByRole" parameterType="Role" resultType="Deptment">
+		
+	</select>
+	<select id="getDeptmentByDeptment" parameterType="Deptment" resultType="Deptment">
+		select 
+			d.id,
+			d.name,
+			d.image_name,
+			d.pid,
+			d.status,
+			d.mark
+		from AUTH_DEPTMENT d
+		where 
+			d.id = #{id}
+	</select>
+	<select id="getDeptmentById" parameterType="String" resultType="Deptment">
+		select 
+			d.id,
+			d.name,
+			d.image_name,
+			d.pid,
+			d.status,
+			d.mark
+		from AUTH_DEPTMENT d
+		where 1=1 
+			<if test="id != null and id != ''">
+				and d.id = #{id}
+			</if>
+	</select>
+	
+	
+	<select id="getDeptmentsByDeptment" parameterType="Deptment" resultType="Deptment">
+		select 
+			d.id,
+			d.name,
+			d.image_name,
+			d.pid,
+			d.status,
+			d.mark
+		from AUTH_DEPTMENT d
+		<if test="id != null and id != ''">
+			START　WITH d.id = #{id}
+    		CONNECT BY PRiOR d.id = d.pid 
+		</if>
+	</select>
+</mapper>

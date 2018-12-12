@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.XjscyxkMapper">
+
+	<!-- 心井生产运行科  -->
+	<resultMap id="xjscyxk_Mp" type="com.hrxt.pojo.Xjscyxk">
+		<result property="seq" 			jdbcType="VARCHAR" column="seq"/>
+		<result property="site_id" 		jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="site_name"/>
+		<result property="yc_id" 		jdbcType="VARCHAR" column="yc_id"/>
+		<result property="yc_name" 		jdbcType="VARCHAR" column="yc_name"/>
+		<result property="well_id" 		jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 	jdbcType="VARCHAR" column="well_name"/>
+		<result property="well_type" 	jdbcType="INTEGER" column="well_type"/>
+		<result property="well_type_name" 	jdbcType="VARCHAR" column="well_type_name"/>
+		<result property="prod_plan_day" 	jdbcType="INTEGER" column="prod_plan_day"/>
+		<result property="condition" 	jdbcType="VARCHAR" column="condition"/>
+		<result property="tj_status" 	jdbcType="VARCHAR" column="tj_status"/>
+		<result property="sh_status" 	jdbcType="VARCHAR" column="sh_status"/>
+		<result property="mark" 		jdbcType="VARCHAR" column="mark"/>
+		<result property="stime" 		jdbcType="VARCHAR" column="stime"/>
+		<result property="create_date" 	jdbcType="DATE" 	column="create_date"/>
+		<result property="stime" 		jdbcType="INTEGER" column="stime"/>
+		<result property="update_date" 	jdbcType="DATE" 	column="update_date"/>
+	</resultMap>
+	
+	<!--  新井生产运行科 报表 bean  -->
+	<resultMap id="xjscyxk_Report_Mp" type="com.hrxt.pojo.XjscyxkReport">
+		<result property="flag" 		jdbcType="VARCHAR" column="flag"/>
+		<result property="type_name" 	jdbcType="VARCHAR" column="type_name"/>
+		<result property="site_id" 		jdbcType="VARCHAR" column="site_id"/>
+		<result property="site_name" 	jdbcType="VARCHAR" column="site_name"/>
+		<result property="well_id" 		jdbcType="VARCHAR" column="well_id"/>
+		<result property="well_name" 	jdbcType="VARCHAR" column="well_name"/>
+		<result property="prod_plan_day" 	jdbcType="VARCHAR" column="prod_plan_day"/>
+		<result property="condition" 	jdbcType="INTEGER" column="condition"/>
+		<result property="mark" 		jdbcType="INTEGER" column="mark"/>
+		
+	</resultMap>
+	
+
+	<!-- 查询心井生产云新科表  —-->
+	<select id="p_dzs_get_xjscyxk" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_GET_XJSCYXK(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_id, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_type, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_tj_starts, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_sh_starts, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_p_index,		mode=IN, jdbcType=INTEGER},
+		  			#{i_p_size, 		mode=IN, jdbcType=INTEGER},
+		  			#{v_totalrecords, 	mode=OUT, jdbcType=INTEGER},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=xjscyxk_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	
+	<select id="p_get_scyxk_report" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_get_scyxk_report(
+					#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_id, 	mode=IN, jdbcType=VARCHAR},
+					#{o_my_cur, 	mode=OUT,jdbcType=CURSOR, resultMap=xjscyxk_Report_Mp}
+		          )
+	    ]]>
+	</select>
+	
+	<select id="p_dzs_del_xjscyxk"  statementType="CALLABLE" parameterType="java.util.Map" >
+		<![CDATA[
+			CALL pkg_dzsbb.P_DZS_DEL_XJSCYXK(
+				#{i_seq,		mode=IN,jdbcType=VARCHAR},
+				#{o_out_numb,	mode=OUT,jdbcType=VARCHAR}
+				#{o_mesg,		mode=OUT,jdbcType=VARCHAR}
+			) 
+		 ]]>
+	</select>
+	
+	
+	<select id="p_dzs_insert_up_xjscyxk" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_insert_up_xjscyxk(
+					#{i_seq, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_site_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_type_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_prod_plan_day, 		mode=IN, jdbcType=INTEGER},
+		  			#{i_condition, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_mark,		mode=IN, jdbcType=VARCHAR},
+		  			#{o_out_numb, 	mode=OUT, jdbcType=VARCHAR}
+		  			#{o_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	
+  
+  	<select id="p_dzs_insert_up_xjscyxk_excel" statementType="CALLABLE" parameterType="java.util.Map">
+		<![CDATA[
+			CALL pkg_dzsbb.p_dzs_insert_up_xjscyxk_excel(
+		  			#{i_site_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_yc_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_stime, 		mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_type_name, mode=IN, jdbcType=VARCHAR},
+		  			#{i_well_name, 	mode=IN, jdbcType=VARCHAR},
+		  			#{i_sh_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_tj_starts, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_prod_plan_day, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_condition, 	mode=IN, jdbcType=INTEGER},
+		  			#{i_mark,		mode=IN, jdbcType=VARCHAR},
+		  			#{o_out_numb, 	mode=OUT, jdbcType=VARCHAR}
+		  			#{o_mesg, 		mode=OUT, jdbcType=VARCHAR}
+			)
+		 ]]>
+	</select>
+	
+	
+	
+	
+	
+</mapper>

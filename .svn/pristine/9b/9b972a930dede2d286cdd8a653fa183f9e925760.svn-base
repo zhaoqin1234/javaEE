@@ -1,0 +1,48 @@
+package com.hrxt.pojo;
+/**
+ * 地质所配注总结 文字
+ * @author admin
+ *
+ */
+public class Dzs_pz_report_summary{
+	
+	private String  id;
+	private String note;
+	private String  orderPort;
+	private String  stime;
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
+	public String getOrderPort() {
+		return orderPort;
+	}
+	public void setOrderPort(String orderPort) {
+		this.orderPort = orderPort;
+	}
+	public String getStime() {
+		return stime;
+	}
+	public void setStime(String stime) {
+		this.stime = stime;
+	}
+	@Override
+	public String toString() {
+		return "Dzs_pz_report_summary [id=" + id + ", note=" + note + ", orderPort=" + orderPort + ", stime=" + stime
+				+ "]";
+	}
+	
+
+
+	
+	
+	
+}

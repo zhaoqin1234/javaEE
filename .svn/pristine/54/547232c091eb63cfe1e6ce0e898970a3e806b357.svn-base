@@ -1,0 +1,110 @@
+package com.hrxt.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hrxt.mapper.CsjhMapper;
+import com.hrxt.pojo.Csjh;
+import com.hrxt.pojo.Page;
+import com.hrxt.service.CsjhService;
+
+import oracle.jdbc.OracleTypes;
+
+
+
+@Service
+@Transactional
+public class CsjhServiceImpl implements CsjhService {
+
+	@Autowired
+	private CsjhMapper csjhMapper;
+
+	@Override
+	public Map<String,Object> getMonthPZList(Csjh xjscyxk, Page<List<Csjh>> page) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", xjscyxk.getSeq());
+		paramMap.put("i_site_id", xjscyxk.getSite_id());
+		paramMap.put("i_yc_id", xjscyxk.getYc_id());
+		paramMap.put("i_well_id", xjscyxk.getWell_id());
+		paramMap.put("i_well_step_id", xjscyxk.getWell_step_id());
+		paramMap.put("i_well_type", xjscyxk.getWell_type());
+		paramMap.put("i_stime", xjscyxk.getStime());
+		paramMap.put("i_well_status", xjscyxk.getWell_status());
+		paramMap.put("i_step_type", xjscyxk.getStep_type());
+		paramMap.put("i_tj_status", xjscyxk.getTj_status());
+		paramMap.put("i_sh_status", xjscyxk.getSh_status());
+		paramMap.put("i_p_index", page.getPageIndex());
+		paramMap.put("i_p_size", page.getPageSize());
+		paramMap.put("v_totalrecords", null);
+		paramMap.put("o_my_cur", OracleTypes.CURSOR);
+		csjhMapper.p_get_csjh(paramMap);
+		List<Csjh> blockList = (List<Csjh>)paramMap.get("o_my_cur");
+		Integer cnt = (Integer)paramMap.get("v_totalrecords");
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("data", blockList);
+		map.put("total", cnt);
+		return map;
+	}
+	
+	@Override
+	public String insertOrUpdate(Csjh csjh) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", csjh.getSeq());
+		paramMap.put("i_site_name", csjh.getSite_name());
+		paramMap.put("i_yc_name", csjh.getYc_name());
+		paramMap.put("i_well_name", csjh.getWell_name());
+		paramMap.put("i_well_type_name", csjh.getWell_type_name());
+		paramMap.put("i_well_status", csjh.getWell_status());
+		paramMap.put("i_well_step_name", csjh.getWell_step_name());
+		paramMap.put("i_prod_daily", csjh.getProd_daily());
+		paramMap.put("i_mark", csjh.getMark());
+		paramMap.put("i_stime", csjh.getStime());
+		paramMap.put("i_tj_starts", csjh.getTj_status());
+		paramMap.put("i_sh_starts", csjh.getSh_status());
+		paramMap.put("o_mesg", "");
+		csjhMapper.p_dzs_insert_up_csjh(paramMap);
+		return (String)paramMap.get("o_mesg");
+	}
+	
+	
+	
+
+	@Override
+	public List<String> batchInsertOrUpdate(List<Csjh> xjscyxklist) {
+		List<String> list = new ArrayList<String>();
+		for (Csjh xjscyxk : xjscyxklist) {
+			String result = insertOrUpdate(xjscyxk);
+			if(result != null) {
+				list.add(result);
+			}else {
+				list.add("");   //避免空值  序列不对饮问题
+			}
+		}
+		return list;
+	}
+
+	
+	
+	@Override
+	public String delOneYPZBB(String sep) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("i_seq", sep);
+		paramMap.put("o_mesg", sep);
+		csjhMapper.p_dzs_del_csjh(paramMap);
+		return (String) paramMap.get("o_mesg");
+	}
+
+	
+	@Override
+	public String delListYPZBB(String sep) {
+		 return delOneYPZBB(sep);
+	}
+
+	
+}

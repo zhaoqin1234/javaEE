@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrxt.mapper.ButtonMapper">
+
+	<insert id="insertButton" parameterType="user">
+		insert into AUTH_BUTTON
+		(id,key,name,suatus,mark) 
+		values(#{id},#{key},#{name},#{suatus},#{mark})
+	</insert>
+
+	
+	
+	<delete id="deleteButtonByButton">
+		delete from AUTH_BUTTON 
+		where id = #{id}
+	</delete>
+	<delete id="deleteButtonById">
+		delete from AUTH_BUTTON 
+		where id = #{value}
+	</delete>
+	<delete id="deleteButtonByIds">
+		delete from AUTH_BUTTON 
+		where id in ${value}
+	</delete>	
+
+
+	<update id="updateButton" parameterType="Menu">
+		update AUTH_BUTTON 
+		set 
+			id=#{id},key=#{key},name=#{name},suatus=#{suatus},mark=#{mark}
+		where 
+			id = #{id}
+	</update>
+	
+	
+	<select id="getButtons" resultType="Button">
+		select 
+			id,key,name,suatus,mark
+		from AUTH_BUTTON
+	</select>
+	<select id="getButtonsByUser" parameterType="User" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.suatus,
+			b.mark 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb,
+			 AUTH_ROLE_MENU rm,
+			 AUTH_USER_ROLE ur
+		where 
+			b.id = mb.BUTTON_ID and
+			mb.MENU_ID_ID = rm.MENU_ID and
+			rm.role_id = ur.ROLE_ID and
+			ur.USER_ID =  #{value}
+	</select>
+	<select id="getButtonsByRole" parameterType="Role" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.suatus,
+			b.mark 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb,
+			 AUTH_ROLE_MENU rm
+		where 
+			b.id = mb.BUTTON_ID and
+			mb.MENU_ID_ID = rm.MENU_ID and
+			rm.role_id =   #{id}
+	</select>
+	<select id="getButtonByButton" parameterType="Menu" resultType="Button">
+		select 
+			b.id,
+			b.key,
+			b.name,
+			b.suatus,
+			b.mark 
+		from AUTH_BUTTON b,
+			 AUTH_MENU_BUTTON mb
+		where 
+			b.id = mb.BUTTON_ID and
+			mb.MENU_ID_ID =  #{id}
+	</select>
+	<select id="getButtonById" parameterType="String" resultType="Button">
+			b.id,
+			b.key,
+			b.name,
+			b.suatus,
+			b.mark 
+		from AUTH_BUTTON b
+		where 
+			b.id =  #{id}
+	</select>
+	
+	
+	
+</mapper>
